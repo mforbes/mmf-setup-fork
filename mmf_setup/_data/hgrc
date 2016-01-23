@@ -1,4 +1,5 @@
 [ui]
+ccommit.verbose=true
 
 [extensions]
 color=
@@ -7,6 +8,8 @@ histedit=
 rebase=
 record=
 shelve=
+strip=
+mmf_setup.nbclean=$MMF_SETUP/nbclean.py
 
 [hooks]
 # This hook adds "%include ../.hgrc" to .hg/hgrc if the .hgrc file exists in
@@ -20,36 +23,4 @@ update = if [ -e .hgrc ] && touch .hg/hgrc \
 [alias]
 lga = glog --style=${MMF_SETUP}/_data/hgthemes/map-cmdline.lg -l20
 
-# The following provide options for commiting only clean versions of
-# jupyter notebooks.  They require the nbstripout package:
-# pip install --index-url=https://bitbucket.org/mforbes/mypi/ nbstripout
-
-# This version will not run commit hooks
-_commit = commit
-cclean = !hg tag -fl cstatus_parent;\
-          hg _commit -qm "CHK: cstatus checkpoint";\
-          hg tag -fl cstatus_checkpoint;\
-          hg debugsetparents cstatus_parent; hg debugrebuilddirstate;\
-          hg status -man0 | xargs -0 nbstripout
-
-crestore = !hg update -C cstatus_checkpoint;\
-            hg debugsetparents cstatus_parent; hg debugrebuilddirstate;\
-            hg strip cstatus_checkpoint --no-backup;\
-            hg tag -l --remove cstatus_parent
-
-cstatus = !hg cclean; hg status "$@"; hg crestore
-cdiff   = !hg cclean; hg diff   "$@"; hg crestore
-cediff  = !hg cclean; hg ediff  "$@"; hg crestore
-ccommit = !hg cclean; hg commit "$@";
-           hg tag -fl ccommit-parent;\
-           hg crestore;\
-           hg debugsetparents ccommit-parent; hg debugrebuilddirstate;\
-           hg _commit -qm "OUT: Automatic commit of output";\
-           hg debugsetparents ccommit-parent; hg debugrebuilddirstate;\
-           hg tag -l --remove ccommit-parent
-
-crecord = !hg cclean; hg record "$@";\
-           hg tag -fl ccommit-parent;\
-           hg crestore;\
-           hg debugsetparents ccommit-parent; hg debugrebuilddirstate;\
-           hg tag -l --remove ccommit-parent
+cediff  = !hg nbclean && { hg ediff  "$@"; hg nbrestore; }

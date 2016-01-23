@@ -4,3 +4,7 @@ dist/
 *README.html
 .DS_Store
 *.egg-info*
+htmlcov
+.coverage
+.cache
+*/.\#*

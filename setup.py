@@ -16,7 +16,10 @@ from setuptools.command.test import test as original_test
 
 NAME = "mmf_setup"
 
-install_requires = ['nbstripout>=0.2.0']
+install_requires = [
+    'nbstripout>=0.2.0',
+    'python-hglib',
+]
 test_requires = []
 
 # Get the long description from the README.rst file
@@ -26,7 +29,7 @@ with open(os.path.join(_HERE, 'README.rst')) as _f:
 
 
 setup(name=NAME,
-      version='0.1.4',
+      version='0.1.5',
       packages=find_packages(exclude=['tests']),
 
       install_requires=install_requires,
@@ -46,7 +49,7 @@ setup(name=NAME,
       description="Python Tools",
       long_description=LONG_DESCRIPTION,
 
-      license='GPL',
+      license='GNU GPLv2 or any later version',
 
       classifiers=[
           # How mature is this project? Common values are
