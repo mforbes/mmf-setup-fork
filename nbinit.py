@@ -26,6 +26,7 @@ except ImportError:
 \newcommand{\op}[1]{\mathbf{#1}}
 \newcommand{\mat}[1]{\mathbf{#1}}
 \newcommand{\d}{\mathrm{d}}
+\newcommand{\D}[1]{\mathcal{D}[#1]\;}
 \newcommand{\pdiff}[3][]{\frac{\partial^{#1} #2}{\partial {#3}^{#1}}}
 \newcommand{\diff}[3][]{\frac{\d^{#1} #2}{\d {#3}^{#1}}}
 \newcommand{\ddiff}[3][]{\frac{\delta^{#1} #2}{\delta {#3}^{#1}}}
@@ -35,6 +36,9 @@ except ImportError:
 \DeclareMathOperator{\erf}{erf}
 \DeclareMathOperator{\erfi}{erfi}
 \DeclareMathOperator{\sech}{sech}
+\DeclareMathOperator{\sn}{sn}
+\DeclareMathOperator{\cn}{cn}
+\DeclareMathOperator{\dn}{dn}
 \DeclareMathOperator{\sgn}{sgn}
 \DeclareMathOperator{\order}{O}
 \DeclareMathOperator{\diag}{diag}
