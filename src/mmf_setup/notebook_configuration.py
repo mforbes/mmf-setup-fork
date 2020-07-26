@@ -36,8 +36,9 @@ _NBTHEMES = os.path.join(_DATA, 'nbthemes')
 
 _MESSAGE = r"""
 <i>
-<p>This cell contains some definitions for equations and some CSS for styling
-  the notebook. If things look a bit strange, please try the following:
+<p>This cell contains some definitions
+for equations and some CSS for styling the notebook.
+If things look a bit strange, please try the following:
 <ul>
   <li>Choose "Trust Notebook" from the "File" menu.</li>
   <li>Re-execute this cell.</li>
@@ -75,7 +76,7 @@ class MyFormatter(logging.Formatter):
             self,
             fmt="[%(levelname)s %(asctime)s %(name)s] %(message)s",
             datefmt="%H:%M:%S")
-        
+
     def format(self, record):
         record.levelname = record.levelname[0]
         msg = logging.Formatter.format(self, record)
@@ -129,7 +130,7 @@ def nbinit(theme='default', hgroot=True, toggle_code=False, debug=False, quiet=F
     if not handler:
         handler = logging.StreamHandler(os.fdopen(1, "w"))
         logger.addHandler(handler)
- 
+
     handler.setFormatter(MyFormatter())
     handler.setLevel('DEBUG')
     logger.setLevel('DEBUG')
@@ -147,7 +148,7 @@ def nbinit(theme='default', hgroot=True, toggle_code=False, debug=False, quiet=F
                 with open(_file) as _f:
                     return _f.read()
         return ""
-        
+
     def _display(val, wrapper=HTML):
         res.append((val, wrapper))
         display(wrapper(val))
@@ -165,15 +166,21 @@ def nbinit(theme='default', hgroot=True, toggle_code=False, debug=False, quiet=F
     # Remaining HTML
     _display(_load('.html'))
 
-    # Message
-    if not quiet:
-        _display(_MESSAGE)
-        
-    if toggle_code:
-        _display(_TOGGLE_CODE)
+    message = _MESSAGE
 
     if hgroot:
         from .set_path import hgroot
+        if hasattr(hgroot, 'HGROOT'):
+            message = message.replace(
+                "This cell",
+                f"This cell adds HGROOT={hgroot.HGROOT} to your path and")
+
+    # Message
+    if not quiet:
+        _display(message)
+
+    if toggle_code:
+        _display(_TOGGLE_CODE)
 
     if debug:
         return res
