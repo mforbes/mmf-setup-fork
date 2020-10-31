@@ -1,4 +1,10 @@
 #!/bin/bash
+#
+# Initialize the environment for use with my tools.
+#
+# Several additional options are provided as one-time initializations:
+#   cocalc: Initial a CoCalc project for use as described here:
+#      https://alum.mit.edu/www/mforbes/public/notes/cocalc-workflow/
 
 function usage() {
     echo "usage: source mmf_setup [-v]    OR    . mmf_setup [-v]"
@@ -7,7 +13,7 @@ function usage() {
     echo
     echo "For initial setup on sage.mathcloud.com projects:"
     echo
-    echo "   mmf_setup smc"
+    echo "   mmf_setup cocalc"
     echo
 }
 
@@ -20,12 +26,12 @@ do
             echo "mmf_setup environment:"
             echo "$(mmf_setup_bash.py)"
             ;;
-        smc)
+        smc|cocalc)
             DATA_DIR="$(python -c 'import mmf_setup;print(mmf_setup.DATA)')"
-            echo "Seting up config files for Sage Mathcloud..."
+            echo "Seting up config files for CoCalc..."
             shift # move to the next argument
             exec "$BIN_DIR/mmf_initial_setup" \
-                 -v --src "$DATA_DIR/config_files/smc" $*
+                 -v "$DATA_DIR/config_files/cocalc" $*
             ;;
         *)
             usage
