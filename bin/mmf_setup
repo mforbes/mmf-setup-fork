@@ -7,11 +7,11 @@
 #      https://alum.mit.edu/www/mforbes/public/notes/cocalc-workflow/
 
 function usage() {
-    echo "usage: source mmf_setup [-v]    OR    . mmf_setup [-v]"
+    echo "usage: source mmf_setup [-v]  OR  . mmf_setup [-v]  OR  mmf_setup cocalc"
     echo
     echo "  -v : show variables that are set"
     echo
-    echo "For initial setup on sage.mathcloud.com projects:"
+    echo "For initial setup on cocalc.com projects:"
     echo
     echo "   mmf_setup cocalc"
     echo
@@ -30,8 +30,10 @@ do
             DATA_DIR="$(python -c 'import mmf_setup;print(mmf_setup.DATA)')"
             echo "Seting up config files for CoCalc..."
             shift # move to the next argument
-            exec "$BIN_DIR/mmf_initial_setup" \
+            "$BIN_DIR/mmf_initial_setup" \
                  -v "$DATA_DIR/config_files/cocalc" $*
+            cat "$DATA_DIR/config_files/cocalc/message.txt"
+            exit 0
             ;;
         *)
             usage

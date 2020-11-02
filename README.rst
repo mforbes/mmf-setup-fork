@@ -28,6 +28,8 @@
 .. _NBViewer: http://nbviewer.ipython.org
 .. |pip| replace:: ``pip``
 .. _pip: http://www.pip-installer.org/
+.. |nox| replace:: ``nox``
+.. _nox: https://nox.thea.codes
 .. _git: http://git-scm.com/
 .. _github: https://github.com
 .. _RunSnakeRun: http://www.vrplumber.com/programming/runsnakerun/
@@ -277,14 +279,31 @@ use revision numbers etc. for release 0.1.11.)
 1. Make sure your code works and that the tests pass. Pull any open
    issues into the main release branch, closing those issue branches.
 
-   To run the tests, create a bare environment and install
-   everything::
+   To run the tests, make sure you have nox_ and Conda_ installed in
+   some environment, then run::
+
+     nox
+   
+   This will create a bunch of environments in ``.nox`` and run the
+   test-suite on those.
+
+   * To activate one for testing, activate the environment::
+
+       conda activate .nox/test_conda-3-6
+       make test
+       
+   * These can get quite large, so you might want to remove them when
+     you are done with one of the following:: 
+
+       rm -rf .nox
+       make clean        # Does this and more
+
+   To manually run the test suite::
 
      conda env remove -n tst3        # If needed
      conda create -yn tst3 python=3
      conda activate tst3
      pip install -e .[test]
-     py.test
      make test
 
    If you want to test things from conda, you can get a debug

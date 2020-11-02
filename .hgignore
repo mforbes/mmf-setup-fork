@@ -10,4 +10,7 @@ htmlcov
 .coverage
 .cache
 */.\#*
+tests/.testtimes
+.nox
+
 commit_log.txt
