@@ -238,9 +238,9 @@ then your ``HGRCPATH`` will be amended to include this projects
      will remove all output.  It also allows you to track the changes in
      the output.
 
-
-Developer Notes
----------------
+=================
+ Developer Notes
+=================
 
 There are a couple of subtle points here that should be mentioned.
 
@@ -269,7 +269,7 @@ There are a couple of subtle points here that should be mentioned.
 __ https://selenic.com/pipermail/mercurial-devel/2011-December/036480.html
 
 Releases
-++++++++
+========
 
 **PyPi**
 
@@ -327,6 +327,12 @@ use revision numbers etc. for release 0.1.11.)
      meta.yaml
    
 4. Add a note about the changes in ``CHANGES.txt``.
+5. Check that the documentation looks okay::
+
+     make README_CHANGES.html
+     open README_CHANGES.html
+     make clean
+     
 5. Commit the changes.  Start the commit message with::
 
      hg com -m "REL: 0.1.11 ..."
@@ -410,3 +416,4 @@ Various notes about python, IPython, etc. are stored in the docs folder.
 
 __ http://jupyter.cs.brynmawr.edu/hub/dblank/public/Jupyter%20Help.ipynb#2.-Installing-extensions
 __ https://bitbucket.org/ipre/calico/downloads/
+

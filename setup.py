@@ -33,6 +33,7 @@ test_requires = [
     'coverage',
     'mercurial',
     'twine',
+    'docutils',
 ]
 
 extras_require = {

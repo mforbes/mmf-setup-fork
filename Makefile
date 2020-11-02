@@ -28,6 +28,9 @@ test-py:
 
 test: test-hg test-py
 
+README_CHANGES.html: README.rst CHANGES.txt
+	cat $^ | rst2html.py > $@
+
 clean:
 	rm -rf .nox
 	rm -rf .pytest_cache
@@ -35,5 +38,6 @@ clean:
 	find . -name "*.pyc" -delete
 	find . -name "*.pyo" -delete
 	find . -name "__pycache__" -type d -delete
+	rm README_CHANGES.html
 
 .PHONY: help test-cocalc test-hg test-py test clean
