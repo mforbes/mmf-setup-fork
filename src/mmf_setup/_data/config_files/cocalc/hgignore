@@ -13,8 +13,8 @@ syntax: glob
 
 # Various sage things.
 .*.sage-history
-.*.sage-jupyter
-.*.sage-chat
+.*.sage-jupyter*
+.*.sage-chat*
 .*.syncdoc4
 
 *.pyc                           # Compiled python files

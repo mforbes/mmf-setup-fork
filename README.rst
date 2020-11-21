@@ -101,7 +101,7 @@ In particular, I structure it for the following use-cases:
 
 1. To get the notebook initialization features without having to install the
    package, just copy `nbinit.py <nbinit.py>`_ to your project.  Importing this
-   will try to execute `import mmf_setup;mmf_setup.nbinit()` but failing this,
+   will try to execute ``import mmf_setup;mmf_setup.nbinit()`` but failing this,
    will manually run a similar code.
 
 2. Install this package from the source directory, PyPI_, etc. with
@@ -333,28 +333,28 @@ use revision numbers etc. for release 0.1.11.)
      open README_CHANGES.html
      make clean
      
-5. Commit the changes.  Start the commit message with::
+6. Commit the changes.  Start the commit message with::
 
      hg com -m "REL: 0.1.11 ..."
 
-6. Create a pull request (PR) on bitbucket to pull this branch to
+7. Create a pull request (PR) on bitbucket to pull this branch to
    ``default`` and make sure to specify to close the branch on pull.
-7. Check, approve, and merge the PR.
-8. Upload your package to ``pypi`` with ``twine``::
+8. Check, approve, and merge the PR.
+9. Upload your package to ``pypi`` with ``twine``::
 
      python setup.py sdist bdist_wheel
      twine check dist/mmf_setup-*
      twine upload dist/mmf_setup-*
    
-9. Pull the merge from bitbucket to your development machine but **do not update**.
-10. Update the version in ``setup.py`` and ``meta.yaml`` to
+10. Pull the merge from bitbucket to your development machine but **do not update**.
+11. Update the version in ``setup.py`` and ``meta.yaml`` to
     ``'0.1.12dev'`` or whatever is relevant.
-11. From the previous commit (the last commit on branch ``0.1.11`` in this case),
+12. From the previous commit (the last commit on branch ``0.1.11`` in this case),
     change the branch::
 
       hg branch 0.1.12
       
-12. Commit and optionally push.  Now you are ready to work on new changes::
+13. Commit and optionally push.  Now you are ready to work on new changes::
 
       hg com -m "BRN: Start branch 0.1.12"
       hg push -r . --new-branch
@@ -362,7 +362,7 @@ use revision numbers etc. for release 0.1.11.)
 **Anaconda**
 
 The information about building the package for conda is specified in
-the `meta.yaml` file.
+the ``meta.yaml`` file.
 
 1. (Optional) Prepare a clean environment::
      
@@ -373,15 +373,17 @@ the `meta.yaml` file.
    *(I keep the conda build tools in my base environment so I do not
    need this.)*
       
-2. Build locally and test::
+2. Build locally and test.  Note: we need to specify the channel since
+   ``python-hglib`` is there.  Since we will host this on our channel,
+   this will be explicitly specified by anyone installing ``mmf_setup``::
 
       conda config --set anaconda_upload no
-      conda build .
+      conda build --override-channels -c defaults -c conda-forge -c mforbes .
 
 3. (Optional) Debugging a failed build. If things go wrong before
    building, use a conda debug environment::
 
-      conda debug .
+      conda debug -c mforbes .
       cd .../conda-bld/debug_.../work && source .../conda-bld/debug_.../work/build_env_setup.sh
       bash conda_build.sh
 
