@@ -22,6 +22,7 @@ NAME = "mmf_setup"
 install_requires = [
     "nbstripout>=0.2.0",
     "python-hglib",
+    "hg-evolve",
 ]
 
 test_requires = [

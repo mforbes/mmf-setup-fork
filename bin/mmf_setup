@@ -27,8 +27,14 @@ do
             echo "$(mmf_setup_bash.py)"
             ;;
         smc|cocalc)
+            hg="$(type -p hg)"
+            hg_python="$(sed -n '1{s/^#![[:blank:]]*//p;q}' ${hg})"
+            echo "Installing hg-evolve for hg=${hg}..."
+            echo "${hg_python} -m pip install --user hg-evolve"
+            ${hg_python} -m pip install --user hg-evolve
+            
             DATA_DIR="$(python -c 'import mmf_setup;print(mmf_setup.DATA)')"
-            echo "Seting up config files for CoCalc..."
+            echo "Setting up config files for CoCalc..."
             shift # move to the next argument
             "$BIN_DIR/mmf_initial_setup" \
                  -v "$DATA_DIR/config_files/cocalc" $*

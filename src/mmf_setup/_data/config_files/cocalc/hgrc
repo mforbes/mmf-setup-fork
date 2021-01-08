@@ -26,6 +26,7 @@ ignore.common = ~/.hgignore
 
 [extensions]
 color =
+evolve =
 graphlog =
 hgext.convert =
 hgext.extdiff =
@@ -34,7 +35,6 @@ rebase =
 record =
 shelve =
 #amend =
-#evolve =
 #mq =
 #purge =
 #strip =
