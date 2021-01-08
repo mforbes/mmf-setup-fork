@@ -5,4 +5,4 @@ import nox
 def test_conda(session):
     session.install(".[test]")
     session.run("pytest")
-    session.run("make", "test")
+    session.run("make", "test", external=True)

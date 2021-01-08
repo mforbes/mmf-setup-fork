@@ -28,10 +28,15 @@ do
             ;;
         smc|cocalc)
             hg="$(type -p hg)"
-            hg_python="$(sed -n '1{s/^#![[:blank:]]*//p;q}' ${hg})"
-            echo "Installing hg-evolve for hg=${hg}..."
-            echo "${hg_python} -m pip install --user hg-evolve"
-            ${hg_python} -m pip install --user hg-evolve
+            if [[ -n "${hg}" ]];
+            then
+                # https://stackoverflow.com/a/27864045
+                # Assumes the python command has no spaces in it.
+                hg_python=$(sed -n '1s/^#!//p' "${hg}")
+                echo "Installing hg-evolve for hg=${hg}..."
+                echo "${hg_python} -m pip install --user hg-evolve"
+                ${hg_python} -m pip install --user hg-evolve
+            fi
             
             DATA_DIR="$(python -c 'import mmf_setup;print(mmf_setup.DATA)')"
             echo "Setting up config files for CoCalc..."

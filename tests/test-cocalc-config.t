@@ -31,12 +31,16 @@
   $ mkdir home
   $ touch home/.bash_aliases
   $ mmf_setup cocalc -n --home="./home"
-  Seting up config files for CoCalc...
+  Installing hg-evolve for hg=*/bin/hg... (glob)
+  */python -m pip install --user hg-evolve (glob)
+  * (glob)
+  Setting up config files for CoCalc...
   Using <home> = ./home
   Using dir = */site-packages/mmf_setup/_data/config_files/cocalc (glob)
   File ./home/.bash_aliases exists.
   backup('./home/.bash_aliases')
   os.symlink('*/config_files/cocalc/bash_aliases', './home/.bash_aliases') (glob)
+  os.symlink('*/config_files/cocalc/mrconfig', './home/.mrconfig') (glob)
   os.symlink('*/config_files/cocalc/hgrc', './home/.hgrc') (glob)
   os.symlink('*/config_files/cocalc/inputrc', './home/.inputrc') (glob)
   os.symlink('*/config_files/cocalc/hgignore', './home/.hgignore') (glob)
@@ -63,14 +67,19 @@
         SendEnv LC_HG_USERNAME
         SendEnv LC_GIT_USERNAME
         SendEnv LC_GIT_USEREMAIL
+        SetEnv LC_EDITOR=vi
   $ mmf_setup cocalc --home="./home"
-  Seting up config files for CoCalc...
+  Installing hg-evolve for hg=*/bin/hg... (glob)
+  */bin/python -m pip install --user hg-evolve (glob)
+  * (glob)
+  Setting up config files for CoCalc...
   Using <home> = ./home
   Using dir = */site-packages/mmf_setup/_data/config_files/cocalc (glob)
   File ./home/.bash_aliases exists.
   backup('./home/.bash_aliases')
   os.rename('./home/.bash_aliases', './home/.bash_aliases.bak')
   os.symlink('*/config_files/cocalc/bash_aliases', './home/.bash_aliases') (glob)
+  os.symlink('*/config_files/cocalc/mrconfig', './home/.mrconfig') (glob)
   os.symlink('*/config_files/cocalc/hgrc', './home/.hgrc') (glob)
   os.symlink('*/config_files/cocalc/inputrc', './home/.inputrc') (glob)
   os.symlink('*/config_files/cocalc/hgignore', './home/.hgignore') (glob)
@@ -97,6 +106,7 @@
         SendEnv LC_HG_USERNAME
         SendEnv LC_GIT_USERNAME
         SendEnv LC_GIT_USEREMAIL
+        SetEnv LC_EDITOR=vi
   $ ls -aF ./home
   ./
   ../
@@ -105,13 +115,20 @@
   .hgignore@
   .hgrc@
   .inputrc@
+  .mrconfig@
   $ mmf_setup cocalc -v --home="./home"
-  Seting up config files for CoCalc...
+  Installing hg-evolve for hg=*/bin/hg... (glob)
+  */bin/python -m pip install --user hg-evolve (glob)
+  * (glob)
+  Setting up config files for CoCalc...
   Using <home> = ./home
   Using dir = */mmf_setup/_data/config_files/cocalc (glob)
   Symlink ./home/.bash_aliases exists.
   os.remove('./home/.bash_aliases')
   os.symlink('*/config_files/cocalc/bash_aliases', './home/.bash_aliases') (glob)
+  Symlink ./home/.mrconfig exists.
+  os.remove('./home/.mrconfig')
+  os.symlink('*/config_files/cocalc/mrconfig', './home/.mrconfig') (glob)
   Symlink ./home/.hgrc exists.
   os.remove('./home/.hgrc')
   os.symlink('*/config_files/cocalc/hgrc', './home/.hgrc') (glob)
@@ -144,6 +161,7 @@
         SendEnv LC_HG_USERNAME
         SendEnv LC_GIT_USERNAME
         SendEnv LC_GIT_USEREMAIL
+        SetEnv LC_EDITOR=vi
   $ ls -aF ./home
   ./
   ../
@@ -152,3 +170,4 @@
   .hgignore@
   .hgrc@
   .inputrc@
+  .mrconfig@
