@@ -86,7 +86,16 @@ In particular, I structure it for the following use-cases:
    example, I often use [CoCalc](cocalc.com).
    Whenever I create a new project, I need to perform some
    initialization.  With this project, it is simply a matter of using
-   |pip|_ to install this package, and then using some of the tools.
+   |pip|_ to install this package, and then using some of the
+   tools. Specifically::
+
+     pip install --user mmf_setup
+     mmf_setup cocalc
+
+     # OR install from a particular version of the sources.
+     pip install --user hg+https://hg.iscimath.org/mforbes/mmf_setup@0.3.1
+     mmf_setup cocalc
+
 2. Initial setup of a python distribution on a new computer.  This is
    a little more involved since one needs to first install python (I
    recommend using Miniconda_) and then updating the tools.
@@ -109,15 +118,15 @@ In particular, I structure it for the following use-cases:
   
    * **Directly from PyPI**
 
-     ``pip install --process-dependency-links --user mmf_setup[nbextensions]``
+     ``pip install --user mmf_setup[nbextensions]``
 
    * **From Source**
 
-     ``pip install --process-dependency-links --user hg+https://bitbucket.org/mforbes/mmf_setup[nbextensions]``
+     ``pip install --user hg+https://hg.iscimath.org/mforbes/mmf_setup[nbextensions]``
 
    * **From Local Source** (*Run this from the source directory after you unpack it.*)
 
-     ``pip install --process-dependency-links --user .[nbextnensions]``
+     ``pip install --user .[nbextnensions]``
 
    Note: these can be run without the ``--user`` flag if you want to
    install them system-wide rather than into |site.USER_BASE|_.
