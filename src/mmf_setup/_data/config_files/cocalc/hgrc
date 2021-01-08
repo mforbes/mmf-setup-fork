@@ -19,6 +19,7 @@
 [ui]
 username = $LC_HG_USERNAME
 merge = emacs
+paginate = never
 
 # Common global ignores
 ignore.common = ~/.hgignore
@@ -26,13 +27,24 @@ ignore.common = ~/.hgignore
 [extensions]
 color =
 graphlog =
-hgext.extdiff =
 hgext.convert =
-rebase =
-mq =
-record =
+hgext.extdiff =
 histedit =
-purge =
-transplant =
-#evolve =
+rebase =
+record =
+shelve =
 #amend =
+#evolve =
+#mq =
+#purge =
+#strip =
+#transplant =
+
+[color]
+custom.rev = red
+custom.author = blue
+custom.date = green
+custom.branches = red
+
+[merge-tools]
+emacs.args = -q --eval "(require 'ediff)" --eval "(setq ediff-window-setup-function 'ediff-setup-windows-plain)" --eval "(add-hook 'ediff-quit-hook 'save-buffers-kill-emacs)" --eval "(ediff-merge-with-ancestor \""$local"\" \""$other"\" \""$base"\" nil \""$output"\")"

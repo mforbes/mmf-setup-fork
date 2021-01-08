@@ -1,7 +1,30 @@
+# Much of tis configuration comes from
+# https://octobus.net/blog/2020-11-26-modern-mercurial.html
 [ui]
-ccommit.verbose=true
+tweakdefaults = true
+# Merge conflict markers in files (they look like "<<<<<<<") are more verbose
+mergemarkers = detailed
+# Uses the internal non-interactive simple merge algorithm for merging
+# files. It will fail if there are any conflicts and leave markers in the
+# partially merged file. Marker will have three sections, one from each
+# side of the merge and one for the base content.
+merge = :merge3
+
+ccommit.verbose = true
+
+[commands]
+# Require the user to pass a revision (or revset) to "push" instead of pushing
+# all heads by default.
+push.require-revs = true
+
+[paths]
+# Default to the current revision (`.`) when pushing to `default`. 
+default:pushrev = .
 
 [extensions]
+# ==== "Core" extensions ====
+# Extensions that come pre-packaged with Mercurial:
+
 color=
 graphlog=
 histedit=
@@ -9,6 +32,11 @@ rebase=
 record=
 shelve=
 strip=
+
+# Automatically finds where to amend the different bits of your working
+# directory into the right changesets and does so interactively.
+absorb =
+
 mmf_setup.nbclean=$MMF_SETUP/nbclean.py
 
 [hooks]

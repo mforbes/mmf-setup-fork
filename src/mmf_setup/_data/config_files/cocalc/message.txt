@@ -21,3 +21,4 @@ To forward these, your SSH config file (~/.ssh/config) might look like:
       SendEnv LC_HG_USERNAME
       SendEnv LC_GIT_USERNAME
       SendEnv LC_GIT_USEREMAIL
+      SetEnv LC_EDITOR=vi
