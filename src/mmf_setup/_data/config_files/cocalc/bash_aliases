@@ -25,7 +25,7 @@ export SCREENDIR=~/.screen
 # CoCalc defaults to joe: https://joe-editor.sourceforge.io/.  Here I
 # allow the user to customize the editor by passing the LC_EDITOR
 # environmental variable.  Add SetEnv LC_EDITOR=vi to your ~/.ssh/config file.
-if [ -z ${LC_EDITOR+x} ]; then
+if [ -n ${LC_EDITOR} ]; then
     export EDITOR=${LC_EDITOR}
 fi
 
