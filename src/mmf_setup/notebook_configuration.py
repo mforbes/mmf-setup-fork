@@ -87,7 +87,14 @@ class MyFormatter(logging.Formatter):
         return msg
 
 
-def nbinit(theme="default", hgroot=True, toggle_code=False, debug=False, quiet=False):
+def nbinit(
+    theme="default",
+    hgroot=True,
+    toggle_code=False,
+    debug=False,
+    console_logging=True,
+    quiet=False,
+):
     """Initialize a notebook.
 
     This function displays a set of CSS and javascript code to customize the
@@ -109,6 +116,8 @@ def nbinit(theme="default", hgroot=True, toggle_code=False, debug=False, quiet=F
     debug : bool
        If `True`, then return the list of CSS etc. code displayed to the
        notebook.
+    console_logging : bool
+       If `True`, then add an error handler that logs messages to the console.
     quiet : bool
        If `True`, then do not display message about reloading and trusting notebook.
     """
@@ -119,23 +128,24 @@ def nbinit(theme="default", hgroot=True, toggle_code=False, debug=False, quiet=F
     # Not exactly sure why this works, but here we add a handler
     # to send output to the main console.
     # https://stackoverflow.com/a/39331977/1088938
-    logger = logging.getLogger()
-    handler = None
-    for h in logger.handlers:
-        try:
-            if h.stream.fileno() == 1:
-                handler = h
-                break
-        except Exception:
-            pass
+    if console_logging:
+        logger = logging.getLogger()
+        handler = None
+        for h in logger.handlers:
+            try:
+                if h.stream.fileno() == 1:
+                    handler = h
+                    break
+            except Exception:
+                pass
 
-    if not handler:
-        handler = logging.StreamHandler(os.fdopen(1, "w"))
-        logger.addHandler(handler)
+        if not handler:
+            handler = logging.StreamHandler(open(1, "w", encoding="utf-8"))
+            logger.addHandler(handler)
 
-    handler.setFormatter(MyFormatter())
-    handler.setLevel("DEBUG")
-    logger.setLevel("DEBUG")
+        handler.setFormatter(MyFormatter())
+        handler.setLevel("DEBUG")
+        logger.setLevel("DEBUG")
 
     ####################
     # Accumulate output for notebook to setup MathJaX etc.
