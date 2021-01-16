@@ -13,11 +13,12 @@ esac
 
 # Bash Command History
 # https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps
+# https://superuser.com/questions/232885
 export INPUTRC=~/.inputrc
 export HISTSIZE=5000           # Commands in memory.
-export HISTFILESIZE=100000     # Should keep file <~1MB
+export HISTFILESIZE=500000     # Should keep file <~5MB
 export HISTIGNORE='&:ls:[bf]g:exit:pwd:rm *;'
-export HISTCONTROL=ignoreboth
+export HISTCONTROL=ignoreboth:erasedups
 shopt -s histappend            # Ensure we keep history
 
 export SCREENDIR=~/.screen

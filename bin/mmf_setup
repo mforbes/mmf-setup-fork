@@ -44,6 +44,10 @@ do
             "$BIN_DIR/mmf_initial_setup" \
                  -v "$DATA_DIR/config_files/cocalc" $*
             cat "$DATA_DIR/config_files/cocalc/message.txt"
+
+            # Upgrade jupytext
+            echo "Upgrading jupytext..."
+            pip3 install --upgrade --user jupytext
             exit 0
             ;;
         *)
