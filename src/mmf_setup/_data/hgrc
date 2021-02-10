@@ -50,5 +50,18 @@ update = if [ -e .hgrc ] && touch .hg/hgrc \
 
 [alias]
 lga = glog --style=${MMF_SETUP}/_data/hgthemes/map-cmdline.lg -l20
+checkpoint = !$HG commit -m "CHK: Automatic checkpoint" && \
+    $HG phase -fs . || true && \
+    $HG debugsetparents .^1 && \
+    $HG debugrebuildstate
+chk = checkpoint
 
 cediff  = !hg nbclean && { hg ediff  "$@"; hg nbrestore; }
+
+[extdiff]
+# add new command called ediff, runs emacs diff
+cmd.ediff = ediff
+
+[merge-tools]
+emerge.args = $local $other $base $output
+emerge.premerge = True
