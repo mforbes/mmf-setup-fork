@@ -11,6 +11,10 @@ esac
 # Add my mercurial commands like hg ccom for removing output from .ipynb files
 . mmf_setup
 
+# Specified here since .gitconfig will not expand the variables
+git config --global user.name "${LC_GIT_USERNAME}"
+git config --global user.email "${LC_GIT_USEREMAIL}"
+
 # Bash Command History
 # https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps
 # https://superuser.com/questions/232885

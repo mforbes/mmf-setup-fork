@@ -29,6 +29,8 @@ _build                          # I put LaTeX build products here.
 *.log
 *.synctex*
 
+# VIM
+*.swp
 
 ### CoCalc Platform ###
 /.snapshots/
