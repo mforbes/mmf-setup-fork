@@ -40,6 +40,8 @@ shelve =
 #strip =
 #transplant =
 
+hggit = 
+
 [color]
 custom.rev = red
 custom.author = blue

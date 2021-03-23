@@ -30,12 +30,13 @@ do
             hg="$(type -p hg)"
             if [[ -n "${hg}" ]];
             then
-                # https://stackoverflow.com/a/27864045
-                # Assumes the python command has no spaces in it.
-                hg_python=$(sed -n '1s/^#!//p' "${hg}")
-                echo "Installing hg-evolve for hg=${hg}..."
-                echo "${hg_python} -m pip install --user hg-evolve"
-                ${hg_python} -m pip install --user hg-evolve
+		            hg_python="$(hg debuginstall -T'{pythonexe}')"
+                echo "Upgrading mercurial, hg-evolve, and hg-git for hg=${hg}..."
+                echo "${hg_python} -m pip install --upgrade --user mercurial hg-evolve hg-git"
+                ${hg_python} -m pip install --upgrade --user mercurial hg-evolve hg-git
+            else
+                echo "Installing mercurial, hg-evolve, and hg-git for python3..."
+                python3 -m pip install --upgrade --user mercurial hg-evolve hg-git
             fi
             
             DATA_DIR="$(python -c 'import mmf_setup;print(mmf_setup.DATA)')"
@@ -46,8 +47,8 @@ do
             cat "$DATA_DIR/config_files/cocalc/message.txt"
 
             # Upgrade jupytext
-            echo "Upgrading jupytext..."
-            pip3 install --upgrade --user jupytext
+            echo "Upgrading jupytext for python3..."
+            python3 -m pip install --upgrade --user jupytext
             exit 0
             ;;
         *)
