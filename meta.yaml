@@ -1,5 +1,5 @@
 {% set name = "mmf_setup" %}
-{% set version = "0.3.0" %}
+{% set version = "0.3.1" %}
 
 package:
   name: "{{ name|lower }}"
@@ -43,10 +43,11 @@ test:
     - make test
 
 about:
-  home: https://bitbucket.org/mforbes/mmf_setup
+  home: https://pypi.org/project/mmf-setup/
+  # https://bitbucket.org/mforbes/mmf_setup
   license: GNU General Public v3 or later (GPLv3+)
   license_family: GPL3
   license_file: LICENSE.txt
   summary: Python Tools
-  doc_url:
+  doc_url: https://pypi.org/project/mmf-setup/
   dev_url:

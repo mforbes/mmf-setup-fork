@@ -1,12 +1,15 @@
 try:
     import mmf_setup
+
     mmf_setup.nbinit()
 except ImportError:
     import subprocess
     import sys
     from IPython.display import HTML, Javascript, display
-    
-    display(HTML(r"""
+
+    display(
+        HTML(
+            r"""
 <style>
 .grade {
    background-color: #66FFCC;
@@ -56,10 +59,12 @@ except ImportError:
 </ul>
 </p>
 </i>
-"""))
+"""
+        )
+    )
 
     try:
-        HGROOT = subprocess.check_output(['hg', 'root']).strip()
+        HGROOT = subprocess.check_output(["hg", "root"]).strip()
         if HGROOT not in sys.path:
             sys.path.insert(0, HGROOT)
     except subprocess.CalledProcessError:

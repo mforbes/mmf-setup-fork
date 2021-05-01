@@ -28,6 +28,8 @@
 .. _NBViewer: http://nbviewer.ipython.org
 .. |pip| replace:: ``pip``
 .. _pip: http://www.pip-installer.org/
+.. |nox| replace:: ``nox``
+.. _nox: https://nox.thea.codes
 .. _git: http://git-scm.com/
 .. _github: https://github.com
 .. _RunSnakeRun: http://www.vrplumber.com/programming/runsnakerun/
@@ -84,7 +86,16 @@ In particular, I structure it for the following use-cases:
    example, I often use [CoCalc](cocalc.com).
    Whenever I create a new project, I need to perform some
    initialization.  With this project, it is simply a matter of using
-   |pip|_ to install this package, and then using some of the tools.
+   |pip|_ to install this package, and then using some of the
+   tools. Specifically::
+
+     pip install --user mmf_setup
+     mmf_setup cocalc
+
+     # OR install from a particular version of the sources.
+     pip install --user hg+https://hg.iscimath.org/mforbes/mmf_setup@0.3.1
+     mmf_setup cocalc
+
 2. Initial setup of a python distribution on a new computer.  This is
    a little more involved since one needs to first install python (I
    recommend using Miniconda_) and then updating the tools.
@@ -99,7 +110,7 @@ In particular, I structure it for the following use-cases:
 
 1. To get the notebook initialization features without having to install the
    package, just copy `nbinit.py <nbinit.py>`_ to your project.  Importing this
-   will try to execute `import mmf_setup;mmf_setup.nbinit()` but failing this,
+   will try to execute ``import mmf_setup;mmf_setup.nbinit()`` but failing this,
    will manually run a similar code.
 
 2. Install this package from the source directory, PyPI_, etc. with
@@ -107,15 +118,15 @@ In particular, I structure it for the following use-cases:
   
    * **Directly from PyPI**
 
-     ``pip install --process-dependency-links --user mmf_setup[nbextensions]``
+     ``pip install --user mmf_setup[nbextensions]``
 
    * **From Source**
 
-     ``pip install --process-dependency-links --user hg+https://bitbucket.org/mforbes/mmf_setup[nbextensions]``
+     ``pip install --user hg+https://hg.iscimath.org/mforbes/mmf_setup[nbextensions]``
 
    * **From Local Source** (*Run this from the source directory after you unpack it.*)
 
-     ``pip install --process-dependency-links --user .[nbextnensions]``
+     ``pip install --user .[nbextnensions]``
 
    Note: these can be run without the ``--user`` flag if you want to
    install them system-wide rather than into |site.USER_BASE|_.
@@ -236,9 +247,9 @@ then your ``HGRCPATH`` will be amended to include this projects
      will remove all output.  It also allows you to track the changes in
      the output.
 
-
-Developer Notes
----------------
+=================
+ Developer Notes
+=================
 
 There are a couple of subtle points here that should be mentioned.
 
@@ -267,7 +278,7 @@ There are a couple of subtle points here that should be mentioned.
 __ https://selenic.com/pipermail/mercurial-devel/2011-December/036480.html
 
 Releases
-++++++++
+========
 
 **PyPi**
 
@@ -277,14 +288,31 @@ use revision numbers etc. for release 0.1.11.)
 1. Make sure your code works and that the tests pass. Pull any open
    issues into the main release branch, closing those issue branches.
 
-   To run the tests, create a bare environment and install
-   everything::
+   To run the tests, make sure you have nox_ and Conda_ installed in
+   some environment, then run::
+
+     nox
+   
+   This will create a bunch of environments in ``.nox`` and run the
+   test-suite on those.
+
+   * To activate one for testing, activate the environment::
+
+       conda activate .nox/test_conda-3-6
+       make test
+       
+   * These can get quite large, so you might want to remove them when
+     you are done with one of the following:: 
+
+       rm -rf .nox
+       make clean        # Does this and more
+
+   To manually run the test suite::
 
      conda env remove -n tst3        # If needed
      conda create -yn tst3 python=3
      conda activate tst3
      pip install -e .[test]
-     py.test
      make test
 
    If you want to test things from conda, you can get a debug
@@ -308,28 +336,34 @@ use revision numbers etc. for release 0.1.11.)
      meta.yaml
    
 4. Add a note about the changes in ``CHANGES.txt``.
-5. Commit the changes.  Start the commit message with::
+5. Check that the documentation looks okay::
+
+     make README_CHANGES.html
+     open README_CHANGES.html
+     make clean
+     
+6. Commit the changes.  Start the commit message with::
 
      hg com -m "REL: 0.1.11 ..."
 
-6. Create a pull request (PR) on bitbucket to pull this branch to
+7. Create a pull request (PR) on bitbucket to pull this branch to
    ``default`` and make sure to specify to close the branch on pull.
-7. Check, approve, and merge the PR.
-8. Upload your package to ``pypi`` with ``twine``::
+8. Check, approve, and merge the PR.
+9. Upload your package to ``pypi`` with ``twine``::
 
      python setup.py sdist bdist_wheel
      twine check dist/mmf_setup-*
      twine upload dist/mmf_setup-*
    
-9. Pull the merge from bitbucket to your development machine but **do not update**.
-10. Update the version in ``setup.py`` and ``meta.yaml`` to
+10. Pull the merge from bitbucket to your development machine but **do not update**.
+11. Update the version in ``setup.py`` and ``meta.yaml`` to
     ``'0.1.12dev'`` or whatever is relevant.
-11. From the previous commit (the last commit on branch ``0.1.11`` in this case),
+12. From the previous commit (the last commit on branch ``0.1.11`` in this case),
     change the branch::
 
       hg branch 0.1.12
       
-12. Commit and optionally push.  Now you are ready to work on new changes::
+13. Commit and optionally push.  Now you are ready to work on new changes::
 
       hg com -m "BRN: Start branch 0.1.12"
       hg push -r . --new-branch
@@ -337,7 +371,7 @@ use revision numbers etc. for release 0.1.11.)
 **Anaconda**
 
 The information about building the package for conda is specified in
-the `meta.yaml` file.
+the ``meta.yaml`` file.
 
 1. (Optional) Prepare a clean environment::
      
@@ -348,15 +382,17 @@ the `meta.yaml` file.
    *(I keep the conda build tools in my base environment so I do not
    need this.)*
       
-2. Build locally and test::
+2. Build locally and test.  Note: we need to specify the channel since
+   ``python-hglib`` is there.  Since we will host this on our channel,
+   this will be explicitly specified by anyone installing ``mmf_setup``::
 
       conda config --set anaconda_upload no
-      conda build .
+      conda build --override-channels -c defaults -c conda-forge -c mforbes .
 
 3. (Optional) Debugging a failed build. If things go wrong before
    building, use a conda debug environment::
 
-      conda debug .
+      conda debug -c mforbes .
       cd .../conda-bld/debug_.../work && source .../conda-bld/debug_.../work/build_env_setup.sh
       bash conda_build.sh
 
@@ -391,3 +427,4 @@ Various notes about python, IPython, etc. are stored in the docs folder.
 
 __ http://jupyter.cs.brynmawr.edu/hub/dblank/public/Jupyter%20Help.ipynb#2.-Installing-extensions
 __ https://bitbucket.org/ipre/calico/downloads/
+

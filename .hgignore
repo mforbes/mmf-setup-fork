@@ -3,9 +3,15 @@ syntax: glob
 dist/
 build/
 *README.html
+README_CHANGES.html
 .DS_Store
+.pytest_cache
 *.egg-info*
 htmlcov
 .coverage
 .cache
 */.\#*
+tests/.testtimes
+.nox
+
+commit_log.txt

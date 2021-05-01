@@ -1,4 +1,5 @@
 import copy
+
 try:
     from importlib import reload
 except ImportError:
@@ -24,7 +25,7 @@ def tmpdir():
 
 
 def test_set_path_hgroot():
-    HGROOT = subprocess.check_output(['hg', 'root']).strip().decode('utf8')
+    HGROOT = subprocess.check_output(["hg", "root"]).strip().decode("utf8")
     while HGROOT in sys.path:
         sys.path.remove(HGROOT)
 
@@ -35,16 +36,22 @@ def test_set_path_hgroot():
 
 def test_set_path_from_file_empty_path(tmpdir):
     import mmf_setup.set_path
+
     mmf_setup.ROOT = tmpdir
 
     assert tmpdir not in sys.path
 
     original_path = copy.deepcopy(sys.path)
 
-    def run_test(paths=[], section='mmf_setup', filename='setup.cfg',
-                 expected_paths=None, check=False):
+    def run_test(
+        paths=[],
+        section="mmf_setup",
+        filename="setup.cfg",
+        expected_paths=None,
+        check=False,
+    ):
         sys.path = copy.deepcopy(original_path)
-        with open(os.path.join(tmpdir, filename), 'w') as f:
+        with open(os.path.join(tmpdir, filename), "w") as f:
             f.write("[{}]\n".format(section))
             if paths:
                 f.write("paths = " + paths[0] + "\n")
@@ -68,10 +75,9 @@ def test_set_path_from_file_empty_path(tmpdir):
 
         assert sys.path == expected_paths + original_path
 
-    run_test(paths=['src1'], filename='setup1.cfg')
-    run_test(paths=[], expected_paths=['.'])
-    run_test(paths=['.'])
-    run_test(paths=['.', 'src'])
-    run_test(paths=['.', 'src'], section='mmf_setup_mispelled',
-             expected_paths=[tmpdir])
-    run_test(paths=['.   # comment ignored'], expected_paths=['.'])
+    run_test(paths=["src1"], filename="setup1.cfg")
+    run_test(paths=[], expected_paths=["."])
+    run_test(paths=["."])
+    run_test(paths=[".", "src"])
+    run_test(paths=[".", "src"], section="mmf_setup_mispelled", expected_paths=[tmpdir])
+    run_test(paths=[".   # comment ignored"], expected_paths=["."])

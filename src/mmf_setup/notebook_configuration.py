@@ -28,11 +28,11 @@ try:
 except (ImportError, KeyError):
     HTML = Javascript = display = clear_output = None
 
-__all__ = ['nbinit']
+__all__ = ["nbinit"]
 
 _HERE = os.path.abspath(os.path.dirname(__file__))
-_DATA = os.path.join(_HERE, '_data')
-_NBTHEMES = os.path.join(_DATA, 'nbthemes')
+_DATA = os.path.join(_HERE, "_data")
+_NBTHEMES = os.path.join(_DATA, "nbthemes")
 
 _MESSAGE = r"""
 <i>
@@ -71,21 +71,30 @@ def log(msg, level=logging.INFO):
 
 class MyFormatter(logging.Formatter):
     """Custom logging formatter for sending info to Jupyter console."""
+
     def __init__(self):
         logging.Formatter.__init__(
             self,
             fmt="[%(levelname)s %(asctime)s %(name)s] %(message)s",
-            datefmt="%H:%M:%S")
+            datefmt="%H:%M:%S",
+        )
 
     def format(self, record):
         record.levelname = record.levelname[0]
         msg = logging.Formatter.format(self, record)
         if record.levelno >= logging.WARNING:
-            msg += "\n{}{}:{}".format(" "*14, record.filename, record.lineno)
+            msg += "\n{}{}:{}".format(" " * 14, record.filename, record.lineno)
         return msg
 
 
-def nbinit(theme='default', hgroot=True, toggle_code=False, debug=False, quiet=False):
+def nbinit(
+    theme="default",
+    hgroot=True,
+    toggle_code=False,
+    debug=False,
+    console_logging=True,
+    quiet=False,
+):
     """Initialize a notebook.
 
     This function displays a set of CSS and javascript code to customize the
@@ -107,6 +116,8 @@ def nbinit(theme='default', hgroot=True, toggle_code=False, debug=False, quiet=F
     debug : bool
        If `True`, then return the list of CSS etc. code displayed to the
        notebook.
+    console_logging : bool
+       If `True`, then add an error handler that logs messages to the console.
     quiet : bool
        If `True`, then do not display message about reloading and trusting notebook.
     """
@@ -117,23 +128,24 @@ def nbinit(theme='default', hgroot=True, toggle_code=False, debug=False, quiet=F
     # Not exactly sure why this works, but here we add a handler
     # to send output to the main console.
     # https://stackoverflow.com/a/39331977/1088938
-    logger = logging.getLogger()
-    handler = None
-    for h in logger.handlers:
-        try:
-            if h.stream.fileno() == 1:
-                handler = h
-                break
-        except Exception:
-            pass
+    if console_logging:
+        logger = logging.getLogger()
+        handler = None
+        for h in logger.handlers:
+            try:
+                if h.stream.fileno() == 1:
+                    handler = h
+                    break
+            except Exception:
+                pass
 
-    if not handler:
-        handler = logging.StreamHandler(os.fdopen(1, "w"))
-        logger.addHandler(handler)
+        if not handler:
+            handler = logging.StreamHandler(open(1, "w", encoding="utf-8"))
+            logger.addHandler(handler)
 
-    handler.setFormatter(MyFormatter())
-    handler.setLevel('DEBUG')
-    logger.setLevel('DEBUG')
+        handler.setFormatter(MyFormatter())
+        handler.setLevel("DEBUG")
+        logger.setLevel("DEBUG")
 
     ####################
     # Accumulate output for notebook to setup MathJaX etc.
@@ -141,9 +153,10 @@ def nbinit(theme='default', hgroot=True, toggle_code=False, debug=False, quiet=F
 
     def _load(ext, theme=theme):
         """Try loading resource from theme, fallback to default"""
-        for _theme in [theme, 'default']:
-            _file = os.path.join(_NBTHEMES,
-                                 '{theme}{ext}'.format(theme=_theme, ext=ext))
+        for _theme in [theme, "default"]:
+            _file = os.path.join(
+                _NBTHEMES, "{theme}{ext}".format(theme=_theme, ext=ext)
+            )
             if os.path.exists(_file):
                 with open(_file) as _f:
                     return _f.read()
@@ -157,23 +170,24 @@ def nbinit(theme='default', hgroot=True, toggle_code=False, debug=False, quiet=F
     _display(r"<style>{}</style>".format(_load(".css")))
 
     # Javascript
-    _display(_load('.js'), wrapper=Javascript)
+    _display(_load(".js"), wrapper=Javascript)
 
     # LaTeX commands
     _template = r'<script id="MathJax-Element-48" type="math/tex">{}</script>'
-    _display(_template.format(_load('.tex').strip()))
+    _display(_template.format(_load(".tex").strip()))
 
     # Remaining HTML
-    _display(_load('.html'))
+    _display(_load(".html"))
 
     message = _MESSAGE
 
     if hgroot:
         from .set_path import hgroot
-        if hasattr(hgroot, 'HGROOT'):
+
+        if hasattr(hgroot, "HGROOT"):
             message = message.replace(
-                "This cell",
-                f"This cell adds HGROOT={hgroot.HGROOT} to your path and")
+                "This cell", f"This cell adds HGROOT={hgroot.HGROOT} to your path and"
+            )
 
     # Message
     if not quiet:
@@ -235,6 +249,7 @@ class Install(object):
 
     def install_nbextension(self, name):
         import notebook
+
         notebook.install_nbextension(name, user=self.user)
 
     def __enter__(self):
@@ -242,14 +257,14 @@ class Install(object):
         # Use environment because --ipython-dir does not always work
         # https://github.com/ipython/ipython/issues/8138
         if self.ipython_dir is not None:
-            if 'IPYTHONDIR' in os.environ:
-                self.old_ipython_dir = os.environ['IPYTHONDIR']
-            os.environ['IPYTHONDIR'] = self.ipython_dir
+            if "IPYTHONDIR" in os.environ:
+                self.old_ipython_dir = os.environ["IPYTHONDIR"]
+            os.environ["IPYTHONDIR"] = self.ipython_dir
         return self
 
     def __exit__(self, type, value, tb):
         if self.old_ipython_dir is not None:
-            os.environ['IPYTHONDIR'] = self.old_ipython_dir
+            os.environ["IPYTHONDIR"] = self.old_ipython_dir
 
         return type is not None
 
@@ -268,14 +283,18 @@ class Install(object):
         * Moving cells by group
         * Spell checking.
         """
-        for _f in ["calico-document-tools-1.0.zip",
-                   "calico-cell-tools-1.0.zip",
-                   "calico-spell-check-1.0.zip"]:
+        for _f in [
+            "calico-document-tools-1.0.zip",
+            "calico-cell-tools-1.0.zip",
+            "calico-spell-check-1.0.zip",
+        ]:
             self.install_nbextension(
-                "https://bitbucket.org/ipre/calico/downloads/{}".format(_f))
+                "https://bitbucket.org/ipre/calico/downloads/{}".format(_f)
+            )
 
     def install_mathjax(self):
         from IPython.external import mathjax
+
         mathjax.install_mathjax()
 
     def install_rise(self):
@@ -285,14 +304,18 @@ class Install(object):
         """
         tmpdir = tempfile.mkdtemp()
         cmds = [
-            ['git', 'clone', 'https://github.com/damianavila/RISE.git',
-             '{}/RISE'.format(tmpdir)]
+            [
+                "git",
+                "clone",
+                "https://github.com/damianavila/RISE.git",
+                "{}/RISE".format(tmpdir),
+            ]
         ]
         run_with_bash(cmds=cmds)
 
-        sys.path.insert(0, '{}/RISE'.format(tmpdir))
-        setup = importlib.import_module('setup')
-        setup.install(use_symlink=False, profile='default', enable=True)
+        sys.path.insert(0, "{}/RISE".format(tmpdir))
+        setup = importlib.import_module("setup")
+        setup.install(use_symlink=False, profile="default", enable=True)
         del sys.path[0]
         shutil.rmtree(tmpdir)
 
@@ -302,5 +325,6 @@ class Install(object):
                 IPython-notebook-extensions/wiki/drag-and-drop
         """
         self.install_nbextension(
-            'https://raw.githubusercontent.com/ipython-contrib/' +
-            'IPython-notebook-extensions/master/usability/dragdrop/main.js')
+            "https://raw.githubusercontent.com/ipython-contrib/"
+            + "IPython-notebook-extensions/master/usability/dragdrop/main.js"
+        )
