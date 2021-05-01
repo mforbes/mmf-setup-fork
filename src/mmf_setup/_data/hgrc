@@ -40,8 +40,6 @@ absorb =
 evolve =
 topic =
 
-mmf_setup.nbclean=$MMF_SETUP/nbclean.py
-
 [hooks]
 # This hook adds "%include ../.hgrc" to .hg/hgrc if the .hgrc file exists in
 # the top level.  This allows one to store a set of paths for example.
@@ -58,8 +56,6 @@ checkpoint = !$HG commit -m "CHK: Automatic checkpoint" && \
     $HG debugsetparents .^1 && \
     $HG debugrebuildstate
 chk = checkpoint
-
-cediff  = !hg nbclean && { hg ediff  "$@"; hg nbrestore; }
 
 # Template styling tricks:
 # http://jamie-wong.com/2012/07/11/my-mercurial-setup-and-workflow-at-khan-academy

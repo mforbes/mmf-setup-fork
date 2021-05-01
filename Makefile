@@ -20,11 +20,8 @@ help:
 test-cocalc:
 	cd tests && MMF_SETUP=$(MMF_SETUP) $(PYTHON) run-tests.py --with-hg=$(HG) test-cocalc*.t $(TESTFLAGS)
 
-test-hg:
-	cd tests && MMF_SETUP=$(MMF_SETUP) $(PYTHON) run-tests.py --with-hg=$(HG) $(TESTFLAGS)
-
 test-py:
-	PY_IGNORE_IMPORTMISMATCH=1 pytest
+	pytest
 
 test: test-hg test-py
 
@@ -32,7 +29,8 @@ README_CHANGES.html: README.rst CHANGES.txt
 	cat $^ | rst2html.py > $@
 
 clean:
-	rm -rf .nox
+	rm -rf .nox src/mmf_setup.egg-info
+	rm -rf tests/.testtimes
 	rm -rf .pytest_cache
 	rm -rf mmf_setup.egg-info
 	find . -name "*.pyc" -delete

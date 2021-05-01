@@ -23,6 +23,7 @@ install_requires = [
     "nbstripout>=0.2.0",
     "python-hglib",
     "hg-evolve",
+    "tomlkit",
 ]
 
 test_requires = [
@@ -41,6 +42,8 @@ extras_require = {
     # https://inneka.com/programming/python/pip-install-test-dependencies-for-tox-from-setup-py/
     "test": test_requires,
     "nbextensions": ["jupyter_contrib_nbextensions"],
+    "hg": ["mercurial>=5.7.1", "hg-evolve>=10.3.0", "hg-git>=0.10.0"],
+    "mercurial": ["mercurial>=5.7.1", "hg-evolve>=10.3.0", "hg-git>=0.10.0"],
 }
 
 
