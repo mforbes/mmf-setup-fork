@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # run-tests.py - Run a set of tests on Mercurial
 #
-# Copyright 2006 Matt Mackall <mpm@selenic.com>
+# Copyright 2006 Olivia Mackall <olivia@selenic.com>
 #
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
@@ -47,12 +47,14 @@ from __future__ import absolute_import, print_function
 
 import argparse
 import collections
+import contextlib
 import difflib
 import distutils.version as version
 import errno
 import json
 import multiprocessing
 import os
+import platform
 import random
 import re
 import shutil
@@ -143,12 +145,12 @@ if sys.version_info > (3, 5, 0):
     PYTHON3 = True
     xrange = range  # we use xrange in one place, and we'd rather not use range
 
-    def _bytespath(p):
+    def _sys2bytes(p):
         if p is None:
             return p
         return p.encode("utf-8")
 
-    def _strpath(p):
+    def _bytes2sys(p):
         if p is None:
             return p
         return p.decode("utf-8")
@@ -165,34 +167,34 @@ if sys.version_info > (3, 5, 0):
                 self._strenv = strenv
 
             def __getitem__(self, k):
-                v = self._strenv.__getitem__(_strpath(k))
-                return _bytespath(v)
+                v = self._strenv.__getitem__(_bytes2sys(k))
+                return _sys2bytes(v)
 
             def __setitem__(self, k, v):
-                self._strenv.__setitem__(_strpath(k), _strpath(v))
+                self._strenv.__setitem__(_bytes2sys(k), _bytes2sys(v))
 
             def __delitem__(self, k):
-                self._strenv.__delitem__(_strpath(k))
+                self._strenv.__delitem__(_bytes2sys(k))
 
             def __contains__(self, k):
-                return self._strenv.__contains__(_strpath(k))
+                return self._strenv.__contains__(_bytes2sys(k))
 
             def __iter__(self):
-                return iter([_bytespath(k) for k in iter(self._strenv)])
+                return iter([_sys2bytes(k) for k in iter(self._strenv)])
 
             def get(self, k, default=None):
-                v = self._strenv.get(_strpath(k), _strpath(default))
-                return _bytespath(v)
+                v = self._strenv.get(_bytes2sys(k), _bytes2sys(default))
+                return _sys2bytes(v)
 
             def pop(self, k, default=None):
-                v = self._strenv.pop(_strpath(k), _strpath(default))
-                return _bytespath(v)
+                v = self._strenv.pop(_bytes2sys(k), _bytes2sys(default))
+                return _sys2bytes(v)
 
         osenvironb = environbytes(os.environ)
 
     getcwdb = getattr(os, "getcwdb")
     if not getcwdb or os.name == "nt":
-        getcwdb = lambda: _bytespath(os.getcwd())
+        getcwdb = lambda: _sys2bytes(os.getcwd())
 
 elif sys.version_info >= (3, 0, 0):
     print(
@@ -207,10 +209,10 @@ else:
     # bytestrings by default, so we don't have to do any extra
     # fiddling there. We define the wrapper functions anyway just to
     # help keep code consistent between platforms.
-    def _bytespath(p):
+    def _sys2bytes(p):
         return p
 
-    _strpath = _bytespath
+    _bytes2sys = _sys2bytes
     osenvironb = os.environ
     getcwdb = os.getcwd
 
@@ -254,12 +256,13 @@ def checkportisavailable(port):
     else:
         family = socket.AF_INET
     try:
-        s = socket.socket(family, socket.SOCK_STREAM)
-        s.bind(("localhost", port))
-        s.close()
+        with contextlib.closing(socket.socket(family, socket.SOCK_STREAM)) as s:
+            s.bind(("localhost", port))
         return True
     except socket.error as exc:
-        if exc.errno not in (
+        if os.name == "nt" and exc.errno == errno.WSAEACCES:
+            return False
+        elif exc.errno not in (
             errno.EADDRINUSE,
             errno.EADDRNOTAVAIL,
             errno.EPROTONOSUPPORT,
@@ -274,10 +277,10 @@ closefds = os.name == "posix"
 def Popen4(cmd, wd, timeout, env=None):
     processlock.acquire()
     p = subprocess.Popen(
-        _strpath(cmd),
+        _bytes2sys(cmd),
         shell=True,
         bufsize=-1,
-        cwd=_strpath(wd),
+        cwd=_bytes2sys(wd),
         env=env,
         close_fds=closefds,
         stdin=subprocess.PIPE,
@@ -298,6 +301,7 @@ def Popen4(cmd, wd, timeout, env=None):
             while time.time() - start < timeout and p.returncode is None:
                 time.sleep(0.1)
             p.timeout = True
+            vlog("# Timout reached for process %d" % p.pid)
             if p.returncode is None:
                 terminate(p)
 
@@ -315,18 +319,20 @@ elif os.environ.get("PYTHON"):
 else:
     raise AssertionError("Could not find Python interpreter")
 
-PYTHON = _bytespath(sysexecutable.replace("\\", "/"))
+PYTHON = _sys2bytes(sysexecutable.replace("\\", "/"))
 IMPL_PATH = b"PYTHONPATH"
 if "java" in sys.platform:
     IMPL_PATH = b"JYTHONPATH"
 
-defaults = {
+default_defaults = {
     "jobs": ("HGTEST_JOBS", multiprocessing.cpu_count()),
     "timeout": ("HGTEST_TIMEOUT", 180),
     "slowtimeout": ("HGTEST_SLOWTIMEOUT", 1500),
     "port": ("HGTEST_PORT", 20059),
     "shell": ("HGTEST_SHELL", "sh"),
 }
+
+defaults = default_defaults.copy()
 
 
 def canonpath(path):
@@ -521,6 +527,16 @@ def getparser():
         action="store_true",
         help="install and use chg wrapper in place of hg",
     )
+    hgconf.add_argument(
+        "--chg-debug",
+        action="store_true",
+        help="show chg debug logs",
+    )
+    hgconf.add_argument(
+        "--rhg",
+        action="store_true",
+        help="install and use rhg Rust implementation in place of hg",
+    )
     hgconf.add_argument("--compiler", help="compiler to build with")
     hgconf.add_argument(
         "--extra-config-opt",
@@ -533,6 +549,7 @@ def getparser():
         "--local",
         action="store_true",
         help="shortcut for --with-hg=<testdir>/../hg, "
+        "--with-rhg=<testdir>/../rust/target/release/rhg if --rhg is set, "
         "and --with-chg=<testdir>/../contrib/chg/chg if --chg is set",
     )
     hgconf.add_argument(
@@ -546,9 +563,24 @@ def getparser():
         help="use pure Python code instead of C extensions",
     )
     hgconf.add_argument(
+        "--rust",
+        action="store_true",
+        help="use Rust code alongside C extensions",
+    )
+    hgconf.add_argument(
+        "--no-rust",
+        action="store_true",
+        help="do not use Rust code even if compiled",
+    )
+    hgconf.add_argument(
         "--with-chg",
         metavar="CHG",
         help="use specified chg wrapper in place of hg",
+    )
+    hgconf.add_argument(
+        "--with-rhg",
+        metavar="RHG",
+        help="use specified rhg Rust implementation in place of hg",
     )
     hgconf.add_argument(
         "--with-hg",
@@ -625,24 +657,37 @@ def parseargs(args, parser):
     if "java" in sys.platform or "__pypy__" in sys.modules:
         options.pure = True
 
+    if platform.python_implementation() != "CPython" and options.rust:
+        parser.error("Rust extensions are only available with CPython")
+
+    if options.pure and options.rust:
+        parser.error("--rust cannot be used with --pure")
+
+    if options.rust and options.no_rust:
+        parser.error("--rust cannot be used with --no-rust")
+
     if options.local:
-        if options.with_hg or options.with_chg:
-            parser.error("--local cannot be used with --with-hg or --with-chg")
-        testdir = os.path.dirname(_bytespath(canonpath(sys.argv[0])))
+        if options.with_hg or options.with_rhg or options.with_chg:
+            parser.error(
+                "--local cannot be used with --with-hg or --with-rhg or --with-chg"
+            )
+        testdir = os.path.dirname(_sys2bytes(canonpath(sys.argv[0])))
         reporootdir = os.path.dirname(testdir)
         pathandattrs = [(b"hg", "with_hg")]
         if options.chg:
             pathandattrs.append((b"contrib/chg/chg", "with_chg"))
+        if options.rhg:
+            pathandattrs.append((b"rust/target/release/rhg", "with_rhg"))
         for relpath, attr in pathandattrs:
             binpath = os.path.join(reporootdir, relpath)
             if os.name != "nt" and not os.access(binpath, os.X_OK):
                 parser.error(
                     "--local specified, but %r not found or " "not executable" % binpath
                 )
-            setattr(options, attr, _strpath(binpath))
+            setattr(options, attr, _bytes2sys(binpath))
 
     if options.with_hg:
-        options.with_hg = canonpath(_bytespath(options.with_hg))
+        options.with_hg = canonpath(_sys2bytes(options.with_hg))
         if not (
             os.path.isfile(options.with_hg) and os.access(options.with_hg, os.X_OK)
         ):
@@ -653,19 +698,36 @@ def parseargs(args, parser):
 
     if (options.chg or options.with_chg) and os.name == "nt":
         parser.error("chg does not work on %s" % os.name)
+    if (options.rhg or options.with_rhg) and os.name == "nt":
+        parser.error("rhg does not work on %s" % os.name)
     if options.with_chg:
         options.chg = False  # no installation to temporary location
-        options.with_chg = canonpath(_bytespath(options.with_chg))
+        options.with_chg = canonpath(_sys2bytes(options.with_chg))
         if not (
             os.path.isfile(options.with_chg) and os.access(options.with_chg, os.X_OK)
         ):
             parser.error("--with-chg must specify a chg executable")
+    if options.with_rhg:
+        options.rhg = False  # no installation to temporary location
+        options.with_rhg = canonpath(_sys2bytes(options.with_rhg))
+        if not (
+            os.path.isfile(options.with_rhg) and os.access(options.with_rhg, os.X_OK)
+        ):
+            parser.error("--with-rhg must specify a rhg executable")
     if options.chg and options.with_hg:
         # chg shares installation location with hg
         parser.error(
             "--chg does not work when --with-hg is specified "
             "(use --with-chg instead)"
         )
+    if options.rhg and options.with_hg:
+        # rhg shares installation location with hg
+        parser.error(
+            "--rhg does not work when --with-hg is specified "
+            "(use --with-rhg instead)"
+        )
+    if options.rhg and options.chg:
+        parser.error("--rhg and --chg do not work together")
 
     if options.color == "always" and not pygmentspresent:
         sys.stderr.write(
@@ -882,6 +944,7 @@ class Test(unittest.TestCase):
         hgcommand=None,
         slowtimeout=None,
         usechg=False,
+        chgdebug=False,
         useipv6=False,
     ):
         """Create a test from parameters.
@@ -919,8 +982,9 @@ class Test(unittest.TestCase):
         if slowtimeout is None:
             slowtimeout = defaults["slowtimeout"]
         self.path = path
+        self.relpath = os.path.relpath(path)
         self.bname = os.path.basename(path)
-        self.name = _strpath(self.bname)
+        self.name = _bytes2sys(self.bname)
         self._testdir = os.path.dirname(path)
         self._outputdir = outputdir
         self._tmpname = os.path.basename(path)
@@ -934,9 +998,10 @@ class Test(unittest.TestCase):
         self._slowtimeout = slowtimeout
         self._startport = startport
         self._extraconfigopts = extraconfigopts or []
-        self._shell = _bytespath(shell)
+        self._shell = _sys2bytes(shell)
         self._hgcommand = hgcommand or b"hg"
         self._usechg = usechg
+        self._chgdebug = chgdebug
         self._useipv6 = useipv6
 
         self._aborted = False
@@ -1142,8 +1207,8 @@ class Test(unittest.TestCase):
             log(
                 "\nKeeping testtmp dir: %s\nKeeping threadtmp dir: %s"
                 % (
-                    self._testtmp.decode("utf-8"),
-                    self._threadtmp.decode("utf-8"),
+                    _bytes2sys(self._testtmp),
+                    _bytes2sys(self._threadtmp),
                 )
             )
         else:
@@ -1244,7 +1309,7 @@ class Test(unittest.TestCase):
         environment."""
         # Put the restoreenv script inside self._threadtmp
         scriptpath = os.path.join(self._threadtmp, b"restoreenv.sh")
-        testenv["HGTEST_RESTOREENV"] = _strpath(scriptpath)
+        testenv["HGTEST_RESTOREENV"] = _bytes2sys(scriptpath)
 
         # Only restore environment variable names that the shell allows
         # us to export.
@@ -1278,15 +1343,22 @@ class Test(unittest.TestCase):
         env = os.environ.copy()
         env["PYTHONUSERBASE"] = sysconfig.get_config_var("userbase") or ""
         env["HGEMITWARNINGS"] = "1"
-        env["TESTTMP"] = _strpath(self._testtmp)
+        env["TESTTMP"] = _bytes2sys(self._testtmp)
         env["TESTNAME"] = self.name
-        env["HOME"] = _strpath(self._testtmp)
+        env["HOME"] = _bytes2sys(self._testtmp)
+        if os.name == "nt":
+            env["REALUSERPROFILE"] = env["USERPROFILE"]
+            # py3.8+ ignores HOME: https://bugs.python.org/issue36264
+            env["USERPROFILE"] = env["HOME"]
+        formated_timeout = _bytes2sys(b"%d" % default_defaults["timeout"][1])
+        env["HGTEST_TIMEOUT_DEFAULT"] = formated_timeout
+        env["HGTEST_TIMEOUT"] = _bytes2sys(b"%d" % self._timeout)
         # This number should match portneeded in _getport
         for port in xrange(3):
             # This list should be parallel to _portmap in _getreplacements
             defineport(port)
-        env["HGRCPATH"] = _strpath(os.path.join(self._threadtmp, b".hgrc"))
-        env["DAEMON_PIDS"] = _strpath(os.path.join(self._threadtmp, b"daemon.pids"))
+        env["HGRCPATH"] = _bytes2sys(os.path.join(self._threadtmp, b".hgrc"))
+        env["DAEMON_PIDS"] = _bytes2sys(os.path.join(self._threadtmp, b"daemon.pids"))
         env["HGEDITOR"] = '"' + sysexecutable + '"' + ' -c "import sys; sys.exit(0)"'
         env["HGUSER"] = "test"
         env["HGENCODING"] = "ascii"
@@ -1303,18 +1375,18 @@ class Test(unittest.TestCase):
 
         extraextensions = []
         for opt in self._extraconfigopts:
-            section, key = opt.encode("utf-8").split(b".", 1)
+            section, key = opt.split(".", 1)
             if section != "extensions":
                 continue
-            name = key.split(b"=", 1)[0]
+            name = key.split("=", 1)[0]
             extraextensions.append(name)
 
         if extraextensions:
-            env["HGTESTEXTRAEXTENSIONS"] = b" ".join(extraextensions)
+            env["HGTESTEXTRAEXTENSIONS"] = " ".join(extraextensions)
 
         # LOCALIP could be ::1 or 127.0.0.1. Useful for tests that require raw
         # IP addresses.
-        env["LOCALIP"] = _strpath(self._localip())
+        env["LOCALIP"] = _bytes2sys(self._localip())
 
         # This has the same effect as Py_LegacyWindowsStdioFlag in exewrapper.c,
         # but this is needed for testing python instances like dummyssh,
@@ -1369,6 +1441,8 @@ class Test(unittest.TestCase):
 
         if self._usechg:
             env["CHGSOCKNAME"] = os.path.join(self._chgsockdir, b"server")
+        if self._chgdebug:
+            env["CHGDEBUG"] = "true"
 
         return env
 
@@ -1378,9 +1452,11 @@ class Test(unittest.TestCase):
             hgrc.write(b"[ui]\n")
             hgrc.write(b"slash = True\n")
             hgrc.write(b"interactive = False\n")
+            hgrc.write(b"detailed-exit-code = True\n")
             hgrc.write(b"merge = internal:merge\n")
             hgrc.write(b"mergemarkers = detailed\n")
             hgrc.write(b"promptecho = True\n")
+            hgrc.write(b"timeout.warn=15\n")
             hgrc.write(b"[defaults]\n")
             hgrc.write(b"[devel]\n")
             hgrc.write(b"all-warnings = true\n")
@@ -1396,11 +1472,11 @@ class Test(unittest.TestCase):
             )
             hgrc.write(b"[web]\n")
             hgrc.write(b"address = localhost\n")
-            hgrc.write(b"ipv6 = %s\n" % str(self._useipv6).encode("ascii"))
+            hgrc.write(b"ipv6 = %r\n" % self._useipv6)
             hgrc.write(b"server-header = testing stub value\n")
 
             for opt in self._extraconfigopts:
-                section, key = opt.encode("utf-8").split(b".", 1)
+                section, key = _sys2bytes(opt).split(b".", 1)
                 assert b"=" in key, (
                     "extra config opt %s must " "have an = for assignment" % opt
                 )
@@ -1419,7 +1495,10 @@ class Test(unittest.TestCase):
         """
         if self._debug:
             proc = subprocess.Popen(
-                _strpath(cmd), shell=True, cwd=_strpath(self._testtmp), env=env
+                _bytes2sys(cmd),
+                shell=True,
+                cwd=_bytes2sys(self._testtmp),
+                env=env,
             )
             ret = proc.wait()
             return (ret, None)
@@ -1518,7 +1597,7 @@ class TTest(Test):
     NEEDESCAPE = re.compile(br"[\x00-\x08\x0b-\x1f\x7f-\xff]").search
 
     ESCAPESUB = re.compile(br"[\x00-\x08\x0b-\x1f\\\x7f-\xff]").sub
-    ESCAPEMAP = dict((bchr(i), br"\x%02x" % i) for i in range(256))
+    ESCAPEMAP = {bchr(i): br"\x%02x" % i for i in range(256)}
     ESCAPEMAP.update({b"\\": b"\\\\", b"\r": br"\r"})
 
     def __init__(self, path, *args, **kwds):
@@ -1529,9 +1608,9 @@ class TTest(Test):
         super(TTest, self).__init__(path, *args, **kwds)
         if case:
             casepath = b"#".join(case)
-            self.name = "%s#%s" % (self.name, _strpath(casepath))
+            self.name = "%s#%s" % (self.name, _bytes2sys(casepath))
             self.errpath = b"%s#%s.err" % (self.errpath[:-4], casepath)
-            self._tmpname += b"-%s" % casepath
+            self._tmpname += b"-%s" % casepath.replace(b"#", b"-")
         self._have = {}
 
     @property
@@ -1580,7 +1659,7 @@ class TTest(Test):
             return self._have.get(allreqs)
 
         # TODO do something smarter when all other uses of hghave are gone.
-        runtestdir = os.path.abspath(os.path.dirname(_bytespath(__file__)))
+        runtestdir = osenvironb[b"RUNTESTDIR"]
         tdir = runtestdir.replace(b"\\", b"/")
         proc = Popen4(
             b'%s -c "%s/hghave %s"' % (self._shell, tdir, allreqs),
@@ -1723,7 +1802,7 @@ class TTest(Test):
 
         if self._case:
             casestr = b"#".join(self._case)
-            if isinstance(self._case, str):
+            if isinstance(casestr, str):
                 quoted = shellquote(casestr)
             else:
                 quoted = shellquote(casestr.decode("utf8")).encode("utf8")
@@ -2002,7 +2081,7 @@ class TTest(Test):
         if el.endswith(b" (esc)\n"):
             if PYTHON3:
                 el = el[:-7].decode("unicode_escape") + "\n"
-                el = el.encode("utf-8")
+                el = el.encode("latin-1")
             else:
                 el = el[:-7].decode("string-escape") + "\n"
         if el == l or os.name == "nt" and el[:-1] + b"\r\n" == l:
@@ -2032,10 +2111,10 @@ class TTest(Test):
         for line in lines:
             if line.startswith(TTest.SKIPPED_PREFIX):
                 line = line.splitlines()[0]
-                missing.append(line[len(TTest.SKIPPED_PREFIX) :].decode("utf-8"))
+                missing.append(_bytes2sys(line[len(TTest.SKIPPED_PREFIX) :]))
             elif line.startswith(TTest.FAILED_PREFIX):
                 line = line.splitlines()[0]
-                failed.append(line[len(TTest.FAILED_PREFIX) :].decode("utf-8"))
+                failed.append(_bytes2sys(line[len(TTest.FAILED_PREFIX) :]))
 
         return missing, failed
 
@@ -2160,7 +2239,7 @@ class TestResult(unittest._TextTestResult):
                 v = self._options.view
                 subprocess.call(
                     r'"%s" "%s" "%s"'
-                    % (v, _strpath(test.refpath), _strpath(test.errpath)),
+                    % (v, _bytes2sys(test.refpath), _bytes2sys(test.errpath)),
                     shell=True,
                 )
             else:
@@ -2188,14 +2267,14 @@ class TestResult(unittest._TextTestResult):
                         "Reference output has changed (run again to prompt " "changes)"
                     )
                 else:
-                    self.stream.write("Accept this change? [n] ")
+                    self.stream.write("Accept this change? [y/N] ")
                     self.stream.flush()
                     answer = sys.stdin.readline().strip()
                     if answer.lower() in ("y", "yes"):
                         if test.path.endswith(b".t"):
                             rename(test.errpath, test.path)
                         else:
-                            rename(test.errpath, "%s.out" % test.path)
+                            rename(test.errpath, b"%s.out" % test.path)
                         accepted = True
             if not accepted:
                 self.faildata[test.name] = b"".join(lines)
@@ -2264,7 +2343,6 @@ class TestSuite(unittest.TestSuite):
         jobs=1,
         whitelist=None,
         blacklist=None,
-        retest=False,
         keywords=None,
         loop=False,
         runs_per_test=1,
@@ -2292,9 +2370,6 @@ class TestSuite(unittest.TestSuite):
         backwards compatible behavior which reports skipped tests as part
         of the results.
 
-        retest denotes whether to retest failed tests. This arguably belongs
-        outside of TestSuite.
-
         keywords denotes key words that will be used to filter which tests
         to execute. This arguably belongs outside of TestSuite.
 
@@ -2305,7 +2380,6 @@ class TestSuite(unittest.TestSuite):
         self._jobs = jobs
         self._whitelist = whitelist
         self._blacklist = blacklist
-        self._retest = retest
         self._keywords = keywords
         self._loop = loop
         self._runs_per_test = runs_per_test
@@ -2330,15 +2404,16 @@ class TestSuite(unittest.TestSuite):
                 result.addSkip(test, "Doesn't exist")
                 continue
 
-            if not (self._whitelist and test.bname in self._whitelist):
-                if self._blacklist and test.bname in self._blacklist:
+            is_whitelisted = self._whitelist and (
+                test.relpath in self._whitelist or test.bname in self._whitelist
+            )
+            if not is_whitelisted:
+                is_blacklisted = self._blacklist and (
+                    test.relpath in self._blacklist or test.bname in self._blacklist
+                )
+                if is_blacklisted:
                     result.addSkip(test, "blacklisted")
                     continue
-
-                if self._retest and not os.path.exists(test.errpath):
-                    result.addIgnore(test, "not retesting")
-                    continue
-
                 if self._keywords:
                     with open(test.path, "rb") as f:
                         t = f.read().lower() + test.bname.lower()
@@ -2477,7 +2552,7 @@ def loadtimes(outputdir):
 def savetimes(outputdir, result):
     saved = dict(loadtimes(outputdir))
     maxruns = 5
-    skipped = set([str(t[0]) for t in result.skipped])
+    skipped = {str(t[0]) for t in result.skipped}
     for tdata in result.times:
         test, real = tdata[0], tdata[3]
         if test not in skipped:
@@ -2636,7 +2711,7 @@ class TextTestRunner(unittest.TextTestRunner):
             opts = ""
             withhg = self._runner.options.with_hg
             if withhg:
-                opts += " --with-hg=%s " % shellquote(_strpath(withhg))
+                opts += " --with-hg=%s " % shellquote(_bytes2sys(withhg))
             rtc = "%s %s %s %s" % (sysexecutable, sys.argv[0], opts, test)
             data = pread(bisectcmd + ["--command", rtc])
             m = re.search(
@@ -2680,7 +2755,7 @@ class TextTestRunner(unittest.TextTestRunner):
     @staticmethod
     def _writexunit(result, outf):
         # See http://llg.cubic.org/docs/junit/ for a reference.
-        timesd = dict((t[0], t[3]) for t in result.times)
+        timesd = {t[0]: t[3] for t in result.times}
         doc = minidom.Document()
         s = doc.createElement("testsuite")
         s.setAttribute("errors", "0")  # TODO
@@ -2857,7 +2932,7 @@ class TestRunner(object):
         self._hgtmp = None
         self._installdir = None
         self._bindir = None
-        self._tmpbinddir = None
+        self._tmpbindir = None
         self._pythondir = None
         self._coveragefile = None
         self._createdfiles = []
@@ -2872,7 +2947,7 @@ class TestRunner(object):
         try:
             parser = parser or getparser()
             options = parseargs(args, parser)
-            tests = [_bytespath(a) for a in options.tests]
+            tests = [_sys2bytes(a) for a in options.tests]
             if options.test_list is not None:
                 for listfile in options.test_list:
                     with open(listfile, "rb") as f:
@@ -2904,7 +2979,7 @@ class TestRunner(object):
                 testdir = os.path.join(testdir, pathname)
         self._testdir = osenvironb[b"TESTDIR"] = testdir
         if self.options.outputdir:
-            self._outputdir = canonpath(_bytespath(self.options.outputdir))
+            self._outputdir = canonpath(_sys2bytes(self.options.outputdir))
         else:
             self._outputdir = getcwdb()
             if testdescs and pathname:
@@ -2919,9 +2994,15 @@ class TestRunner(object):
             # we do the randomness ourself to know what seed is used
             os.environ["PYTHONHASHSEED"] = str(random.getrandbits(32))
 
+        # Rayon (Rust crate for multi-threading) will use all logical CPU cores
+        # by default, causing thrashing on high-cpu-count systems.
+        # Setting its limit to 3 during tests should still let us uncover
+        # multi-threading bugs while keeping the thrashing reasonable.
+        os.environ.setdefault("RAYON_NUM_THREADS", "3")
+
         if self.options.tmpdir:
             self.options.keep_tmpdir = True
-            tmpdir = _bytespath(self.options.tmpdir)
+            tmpdir = _sys2bytes(self.options.tmpdir)
             if os.path.exists(tmpdir):
                 # Meaning of tmpdir has changed since 1.3: we used to create
                 # HGTMP inside tmpdir; now HGTMP is tmpdir.  So fail if
@@ -2950,7 +3031,7 @@ class TestRunner(object):
             os.makedirs(self._tmpbindir)
 
             normbin = os.path.normpath(os.path.abspath(whg))
-            normbin = normbin.replace(os.sep.encode("ascii"), b"/")
+            normbin = normbin.replace(_sys2bytes(os.sep), b"/")
 
             # Other Python scripts in the test harness need to
             # `import mercurial`. If `hg` is a Python script, we assume
@@ -2996,14 +3077,33 @@ class TestRunner(object):
             chgbindir = os.path.dirname(os.path.realpath(self.options.with_chg))
             self._hgcommand = os.path.basename(self.options.with_chg)
 
+        # configure fallback and replace "hg" command by "rhg"
+        rhgbindir = self._bindir
+        if self.options.rhg or self.options.with_rhg:
+            # Affects hghave.py
+            osenvironb[b"RHG_INSTALLED_AS_HG"] = b"1"
+            # Affects configuration. Alternatives would be setting configuration through
+            # `$HGRCPATH` but some tests override that, or changing `_hgcommand` to include
+            # `--config` but that disrupts tests that print command lines and check expected
+            # output.
+            osenvironb[b"RHG_ON_UNSUPPORTED"] = b"fallback"
+            osenvironb[b"RHG_FALLBACK_EXECUTABLE"] = os.path.join(
+                self._bindir, self._hgcommand
+            )
+        if self.options.rhg:
+            self._hgcommand = b"rhg"
+        elif self.options.with_rhg:
+            rhgbindir = os.path.dirname(os.path.realpath(self.options.with_rhg))
+            self._hgcommand = os.path.basename(self.options.with_rhg)
+
         osenvironb[b"BINDIR"] = self._bindir
         osenvironb[b"PYTHON"] = PYTHON
 
-        fileb = _bytespath(__file__)
+        fileb = _sys2bytes(__file__)
         runtestdir = os.path.abspath(os.path.dirname(fileb))
         osenvironb[b"RUNTESTDIR"] = runtestdir
         if PYTHON3:
-            sepb = _bytespath(os.pathsep)
+            sepb = _sys2bytes(os.pathsep)
         else:
             sepb = os.pathsep
         path = [self._bindir, runtestdir] + osenvironb[b"PATH"].split(sepb)
@@ -3014,6 +3114,8 @@ class TestRunner(object):
             path.insert(2, realdir)
         if chgbindir != self._bindir:
             path.insert(1, chgbindir)
+        if rhgbindir != self._bindir:
+            path.insert(1, rhgbindir)
         if self._testdir != runtestdir:
             path = [self._testdir] + path
         if self._tmpbindir != self._bindir:
@@ -3037,6 +3139,13 @@ class TestRunner(object):
         if self.options.pure:
             os.environ["HGTEST_RUN_TESTS_PURE"] = "--pure"
             os.environ["HGMODULEPOLICY"] = "py"
+        if self.options.rust:
+            os.environ["HGMODULEPOLICY"] = "rust+c"
+        if self.options.no_rust:
+            current_policy = os.environ.get("HGMODULEPOLICY", "")
+            if current_policy.startswith("rust+"):
+                os.environ["HGMODULEPOLICY"] = current_policy[len("rust+") :]
+            os.environ.pop("HGWITHRUSTEXT", None)
 
         if self.options.allow_slow_tests:
             os.environ["HGTEST_SLOW"] = "slow"
@@ -3063,16 +3172,16 @@ class TestRunner(object):
                 "extensions.logexceptions=%s" % logexceptions.decode("utf-8")
             )
 
-        vlog("# Using TESTDIR", _strpath(self._testdir))
-        vlog("# Using RUNTESTDIR", _strpath(osenvironb[b"RUNTESTDIR"]))
-        vlog("# Using HGTMP", _strpath(self._hgtmp))
+        vlog("# Using TESTDIR", _bytes2sys(self._testdir))
+        vlog("# Using RUNTESTDIR", _bytes2sys(osenvironb[b"RUNTESTDIR"]))
+        vlog("# Using HGTMP", _bytes2sys(self._hgtmp))
         vlog("# Using PATH", os.environ["PATH"])
         vlog(
             "# Using",
-            _strpath(IMPL_PATH),
-            _strpath(osenvironb[IMPL_PATH]),
+            _bytes2sys(IMPL_PATH),
+            _bytes2sys(osenvironb[IMPL_PATH]),
         )
-        vlog("# Writing to directory", _strpath(self._outputdir))
+        vlog("# Writing to directory", _bytes2sys(self._outputdir))
 
         try:
             return self._runtests(testdescs) or 0
@@ -3089,7 +3198,7 @@ class TestRunner(object):
         if not args:
             if self.options.changed:
                 proc = Popen4(
-                    b'hg st --rev "%s" -man0 .' % _bytespath(self.options.changed),
+                    b'hg st --rev "%s" -man0 .' % _sys2bytes(self.options.changed),
                     None,
                     0,
                 )
@@ -3153,6 +3262,14 @@ class TestRunner(object):
                     tests.append({"path": t})
             else:
                 tests.append({"path": t})
+
+        if self.options.retest:
+            retest_args = []
+            for test in tests:
+                errpath = self._geterrpath(test)
+                if os.path.exists(errpath):
+                    retest_args.append(test)
+            tests = retest_args
         return tests
 
     def _runtests(self, testdescs):
@@ -3169,13 +3286,7 @@ class TestRunner(object):
                 orig = list(testdescs)
                 while testdescs:
                     desc = testdescs[0]
-                    # desc['path'] is a relative path
-                    if "case" in desc:
-                        casestr = b"#".join(desc["case"])
-                        errpath = b"%s#%s.err" % (desc["path"], casestr)
-                    else:
-                        errpath = b"%s.err" % desc["path"]
-                    errpath = os.path.join(self._outputdir, errpath)
+                    errpath = self._geterrpath(desc)
                     if os.path.exists(errpath):
                         break
                     testdescs.pop(0)
@@ -3198,7 +3309,6 @@ class TestRunner(object):
                 jobs=jobs,
                 whitelist=self.options.whitelisted,
                 blacklist=self.options.blacklist,
-                retest=self.options.retest,
                 keywords=kws,
                 loop=self.options.loop,
                 runs_per_test=self.options.runs_per_test,
@@ -3224,6 +3334,9 @@ class TestRunner(object):
                 if self.options.chg:
                     assert self._installdir
                     self._installchg()
+                if self.options.rhg:
+                    assert self._installdir
+                    self._installrhg()
 
                 log("running %d tests using %d parallel processes" % (num_tests, jobs))
 
@@ -3242,6 +3355,19 @@ class TestRunner(object):
 
         if failed:
             return 1
+
+    def _geterrpath(self, test):
+        # test['path'] is a relative path
+        if "case" in test:
+            # for multiple dimensions test cases
+            casestr = b"#".join(test["case"])
+            errpath = b"%s#%s.err" % (test["path"], casestr)
+        else:
+            errpath = b"%s.err" % test["path"]
+        if self.options.outputdir:
+            self._outputdir = canonpath(_sys2bytes(self.options.outputdir))
+            errpath = os.path.join(self._outputdir, errpath)
+        return errpath
 
     def _getport(self, count):
         port = self._ports.get(count)  # do we have a cached entry?
@@ -3280,7 +3406,7 @@ class TestRunner(object):
         tmpdir = os.path.join(self._hgtmp, b"child%d" % count)
 
         # extra keyword parameters. 'case' is used by .t tests
-        kwds = dict((k, testdesc[k]) for k in ["case"] if k in testdesc)
+        kwds = {k: testdesc[k] for k in ["case"] if k in testdesc}
 
         t = testcls(
             refpath,
@@ -3295,6 +3421,7 @@ class TestRunner(object):
             shell=self.options.shell,
             hgcommand=self._hgcommand,
             usechg=bool(self.options.with_chg or self.options.chg),
+            chgdebug=self.options.chg_debug,
             useipv6=useipv6,
             **kwds
         )
@@ -3306,7 +3433,7 @@ class TestRunner(object):
         if self.options.keep_tmpdir:
             return
 
-        vlog("# Cleaning up HGTMP", _strpath(self._hgtmp))
+        vlog("# Cleaning up HGTMP", _bytes2sys(self._hgtmp))
         shutil.rmtree(self._hgtmp, True)
         for f in self._createdfiles:
             try:
@@ -3317,7 +3444,7 @@ class TestRunner(object):
     def _usecorrectpython(self):
         """Configure the environment to use the appropriate Python in tests."""
         # Tests must use the same interpreter as us or bad things will happen.
-        pyexename = sys.platform == "win32" and b"python.exe" or b"python"
+        pyexename = sys.platform == "win32" and b"python.exe" or b"python3"
 
         # os.symlink() is a thing with py3 on Windows, but it requires
         # Administrator rights.
@@ -3343,6 +3470,15 @@ class TestRunner(object):
                     if err.errno != errno.EEXIST:
                         raise
         else:
+            # Windows doesn't have `python3.exe`, and MSYS cannot understand the
+            # reparse point with that name provided by Microsoft.  Create a
+            # simple script on PATH with that name that delegates to the py3
+            # launcher so the shebang lines work.
+            if os.getenv("MSYSTEM"):
+                with open(osenvironb[b"RUNTESTDIR"] + b"/python3", "wb") as f:
+                    f.write(b"#!/bin/sh\n")
+                    f.write(b'py -3 "$@"\n')
+
             exedir, exename = os.path.split(sysexecutable)
             vlog(
                 "# Modifying search path to find %s as %s in '%s'"
@@ -3351,7 +3487,29 @@ class TestRunner(object):
             path = os.environ["PATH"].split(os.pathsep)
             while exedir in path:
                 path.remove(exedir)
-            os.environ["PATH"] = os.pathsep.join([exedir] + path)
+
+            # Binaries installed by pip into the user area like pylint.exe may
+            # not be in PATH by default.
+            extra_paths = [exedir]
+            vi = sys.version_info
+            if "APPDATA" in os.environ:
+                scripts_dir = os.path.join(
+                    os.environ["APPDATA"],
+                    "Python",
+                    "Python%d%d" % (vi[0], vi[1]),
+                    "Scripts",
+                )
+
+                if vi.major == 2:
+                    scripts_dir = os.path.join(
+                        os.environ["APPDATA"],
+                        "Python",
+                        "Scripts",
+                    )
+
+                extra_paths.append(scripts_dir)
+
+            os.environ["PATH"] = os.pathsep.join(extra_paths + path)
             if not self._findprogram(pyexename):
                 print("WARNING: Cannot find %s in search path" % pyexename)
 
@@ -3365,18 +3523,21 @@ class TestRunner(object):
         compiler = ""
         if self.options.compiler:
             compiler = "--compiler " + self.options.compiler
+        setup_opts = b""
         if self.options.pure:
-            pure = b"--pure"
-        else:
-            pure = b""
+            setup_opts = b"--pure"
+        elif self.options.rust:
+            setup_opts = b"--rust"
+        elif self.options.no_rust:
+            setup_opts = b"--no-rust"
 
         # Run installer in hg root
         script = os.path.realpath(sys.argv[0])
         exe = sysexecutable
         if PYTHON3:
-            compiler = _bytespath(compiler)
-            script = _bytespath(script)
-            exe = _bytespath(exe)
+            compiler = _sys2bytes(compiler)
+            script = _sys2bytes(script)
+            exe = _sys2bytes(exe)
         hgroot = os.path.dirname(os.path.dirname(script))
         self._hgroot = hgroot
         os.chdir(hgroot)
@@ -3388,14 +3549,14 @@ class TestRunner(object):
             # when they happen.
             nohome = b""
         cmd = (
-            b'"%(exe)s" setup.py %(pure)s clean --all'
+            b'"%(exe)s" setup.py %(setup_opts)s clean --all'
             b' build %(compiler)s --build-base="%(base)s"'
             b' install --force --prefix="%(prefix)s"'
             b' --install-lib="%(libdir)s"'
             b' --install-scripts="%(bindir)s" %(nohome)s >%(logfile)s 2>&1'
             % {
                 b"exe": exe,
-                b"pure": pure,
+                b"setup_opts": setup_opts,
                 b"compiler": compiler,
                 b"base": os.path.join(self._hgtmp, b"build"),
                 b"prefix": self._installdir,
@@ -3418,7 +3579,7 @@ class TestRunner(object):
         makedirs(self._bindir)
 
         vlog("# Running", cmd.decode("utf-8"))
-        if subprocess.call(_strpath(cmd), shell=True) == 0:
+        if subprocess.call(_bytes2sys(cmd), shell=True) == 0:
             if not self.options.verbose:
                 try:
                     os.remove(installerrs)
@@ -3494,7 +3655,7 @@ class TestRunner(object):
         cmd = b'"%s" -c "import mercurial; print (mercurial.__path__[0])"'
         cmd = cmd % PYTHON
         if PYTHON3:
-            cmd = _strpath(cmd)
+            cmd = _bytes2sys(cmd)
 
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
         out, err = p.communicate()
@@ -3530,6 +3691,33 @@ class TestRunner(object):
                 sys.stdout.write(out)
             sys.exit(1)
 
+    def _installrhg(self):
+        """Install rhg into the test environment"""
+        vlog("# Performing temporary installation of rhg")
+        assert os.path.dirname(self._bindir) == self._installdir
+        assert self._hgroot, "must be called after _installhg()"
+        cmd = b'"%(make)s" install-rhg PREFIX="%(prefix)s"' % {
+            b"make": b"make",  # TODO: switch by option or environment?
+            b"prefix": self._installdir,
+        }
+        cwd = self._hgroot
+        vlog("# Running", cmd)
+        proc = subprocess.Popen(
+            cmd,
+            shell=True,
+            cwd=cwd,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+        out, _err = proc.communicate()
+        if proc.returncode != 0:
+            if PYTHON3:
+                sys.stdout.buffer.write(out)
+            else:
+                sys.stdout.write(out)
+            sys.exit(1)
+
     def _outputcoverage(self):
         """Produce code coverage output."""
         import coverage
@@ -3540,34 +3728,36 @@ class TestRunner(object):
         # chdir is the easiest way to get short, relative paths in the
         # output.
         os.chdir(self._hgroot)
-        covdir = os.path.join(_strpath(self._installdir), "..", "coverage")
+        covdir = os.path.join(_bytes2sys(self._installdir), "..", "coverage")
         cov = coverage(data_file=os.path.join(covdir, "cov"))
 
         # Map install directory paths back to source directory.
-        cov.config.paths["srcdir"] = [".", _strpath(self._pythondir)]
+        cov.config.paths["srcdir"] = [".", _bytes2sys(self._pythondir)]
 
         cov.combine()
 
-        omit = [_strpath(os.path.join(x, b"*")) for x in [self._bindir, self._testdir]]
+        omit = [
+            _bytes2sys(os.path.join(x, b"*")) for x in [self._bindir, self._testdir]
+        ]
         cov.report(ignore_errors=True, omit=omit)
 
         if self.options.htmlcov:
-            htmldir = os.path.join(_strpath(self._outputdir), "htmlcov")
+            htmldir = os.path.join(_bytes2sys(self._outputdir), "htmlcov")
             cov.html_report(directory=htmldir, omit=omit)
         if self.options.annotate:
-            adir = os.path.join(_strpath(self._outputdir), "annotated")
+            adir = os.path.join(_bytes2sys(self._outputdir), "annotated")
             if not os.path.isdir(adir):
                 os.mkdir(adir)
             cov.annotate(directory=adir, omit=omit)
 
     def _findprogram(self, program):
         """Search PATH for a executable program"""
-        dpb = _bytespath(os.defpath)
-        sepb = _bytespath(os.pathsep)
+        dpb = _sys2bytes(os.defpath)
+        sepb = _sys2bytes(os.pathsep)
         for p in osenvironb.get(b"PATH", dpb).split(sepb):
             name = os.path.join(p, program)
             if os.name == "nt" or os.access(name, os.X_OK):
-                return name
+                return _bytes2sys(name)
         return None
 
     def _checktools(self):
@@ -3578,7 +3768,7 @@ class TestRunner(object):
             found = self._findprogram(p)
             p = p.decode("utf-8")
             if found:
-                vlog("# Found prerequisite", p, "at", _strpath(found))
+                vlog("# Found prerequisite", p, "at", found)
             else:
                 print("WARNING: Did not find prerequisite tool: %s " % p)
 
