@@ -1,7 +1,7 @@
 .. -*- rst -*- -*- restructuredtext -*-
 
 .. This file should be written using the restructure text
-.. conventions.  It will be displayed on the bitbucket source page and
+.. conventions.  It will be displayed on the repository source page and
 .. serves as the documentation of the directory.
 
 .. |virtualenv.py| replace:: ``virtualenv.py``
@@ -82,12 +82,10 @@ dependencies.
 
 In particular, I structure it for the following use-cases:
 
-1. Rapid installation and configuration of the tools I need.  For
-   example, I often use [CoCalc](cocalc.com).
-   Whenever I create a new project, I need to perform some
-   initialization.  With this project, it is simply a matter of using
-   |pip|_ to install this package, and then using some of the
-   tools. Specifically::
+1. Rapid installation and configuration of the tools I need.  For example, I often use
+   [CoCalc](cocalc.com).  Whenever I create a new project, I need to perform some
+   initialization.  With this project, it is simply a matter of using |pip|_ to install
+   this package, and then using some of the tools. Specifically::
 
      pip install --user mmf_setup
      mmf_setup cocalc
@@ -96,13 +94,18 @@ In particular, I structure it for the following use-cases:
      pip install --user hg+https://hg.iscimath.org/mforbes/mmf_setup@0.3.1
      mmf_setup cocalc
 
-2. Initial setup of a python distribution on a new computer.  This is
-   a little more involved since one needs to first install python (I
-   recommend using Miniconda_) and then updating the tools.
-3. A place to document various aspects of installing and setting up
-   python and related tools.  Some of this is old, but kept here for
-   reference.
+2. Initial setup of a python distribution on a new computer.  This is a little more
+   involved since one needs to first install python (I recommend using Miniconda_) and
+   then updating the tools.
+3. A place to document various aspects of installing and setting up python and related
+   tools.  Some of this is old, but kept here for reference.
+4. A generic way of setting `sys.path` for development work using the following (in
+   order of decreasing precedence) by importing `mmf_setup.set_path`.
 
+   * An entry in a `pyproject.toml` file somewhere in a higher-level directory.
+   * An entry in a `setup.cfg` file somewhere in a higher-level directory.
+   * The directory returned by `hg root`.
+   * The directory returned by `git rev-parse --show-toplevel`.
 
 ====================
  Quickstart (TL;DR)
@@ -118,18 +121,18 @@ In particular, I structure it for the following use-cases:
   
    * **Directly from PyPI**
 
-     ``pip install --user mmf_setup[nbextensions]``
+     ``python3 -m pip install --user mmf_setup[nbextensions]``
 
    * **From Source**
 
-     ``pip install --user hg+https://hg.iscimath.org/mforbes/mmf_setup[nbextensions]``
+     ``python3 -m pip install --user hg+https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf_setup[nbextensions]``
 
    * **From Local Source** (*Run this from the source directory after you unpack it.*)
 
-     ``pip install --user .[nbextnensions]``
+     ``python3 -m pip install --user .[nbextensions]``
 
-   Note: these can be run without the ``--user`` flag if you want to
-   install them system-wide rather than into |site.USER_BASE|_.
+   Note: these includes the ``nbextensions`` extra.  You and run without the ``--user``
+   flag if you want to install them system-wide  rather than into |site.USER_BASE|_.
 
 3. To get the notebook tools for Jupyter (IPython) notebooks, execute
    the following as a code cell in your notebook and then trust the
@@ -137,42 +140,54 @@ In particular, I structure it for the following use-cases:
 
        import mmf_setup; mmf_setup.nbinit()
 
-   This will download and enable the calico extensions, as well as set
-   the theme which is implemented in the output cell so it is stored
-   for use online such as when rendered through NBViewer_.  One can
-   specify different themes. (Presently only ``theme='default'`` and
-   ``theme='mmf'`` are supported.)
+   This will set the theme which is implemented in the output cell so it is stored for
+   use online such as when rendered through NBViewer_.  One can specify different
+   themes. (Presently only ``theme='default'`` and ``theme='mmf'`` are supported.)
 
-4. To use the mercurial notebook cleaning tools, simply source the
+4. **Mercurial:** If you want to install mercurial with the ``hg-git`` and ``hg-evolve``
+   extensions, then you can do that with the ``hg`` extra::
+
+      python3 -m pip install --user .[hg]
+
+   This essentially runs ``pip install mercurial hg-git hg-evolve``. 
    ``mmf_setup`` script::
 
       . mmf_setup -v
 
    To do this automatically when you login, add this line to your
-   ``~/.bashc`` or ``~/.bash_profile`` scripts.  These can also be
-   enabled manually by adding the following to your ``~/.hgrc`` file::
+   ``~/.bashc`` or ``~/.bash_profile`` scripts.
 
-     [extensions]
-     strip=
-     mmf_setup.nbclean=$MMF_UTILS/nbclean.py
+   These can also be enabled manually by adding the following to your ``~/.hgrc`` file::
 
+      [extensions]
+      evolve =
+      topics =
+      hggit =
+      
+====================
+ Setting `sys.path`
+====================
 
-   where ``$MMF_UTILS`` expands to the install location for the
-   package (which can be seen by running ``mmf_setup -v``).
+The preferred way to work with python code is to install it, preferably into a virtual
+environment or a conda environment.  By installing it, you will assure that your program
+or library is available to notebooks, etc. by being properly inserted into `sys.path`.
+When developing, code, one can also do a `"editable" installs`
+<https://pip.pypa.io/en/stable/reference/pip_install/#local-project-installs>` with
+`pytnon -m install -e <path>` so that code updates are seen.
 
-   This will provide commands for committing clean notebooks such as
-   ``hg cstatus``, ``hg cdiff`` and ``hg ccommit``.
+When developing code, however, this may not meet all use-cases, so we provide some
+generic tools in `mmf_utils.set_path` for manipulating `sys.path`.  These work by
+providing ways to specify local paths for development work.  The following options are
+provided in order of precedence:
 
+One can also manually set the path with one of the following statements:
 
-==================
- Installing Tools
-==================
+* `import mmf_setup.set_path.hgroot`: Sets `mmf_setup.ROOT = mmf_setup.HGROOT` to the
+  outcome of `hg root`.
+* `import mmf_setup.set_path.gitroot`: Sets `mmf_setup.ROOT = mmf_setup.GITROOT` to the
+  outcome of `git rev-parse --show-toplevel`.
+* `import mmf_setup.set_path.config_files`
 
-The following code will download and install the `Calico notebook
-extensions`__ from `here`__::
-
-      import mmf_setup.notebook_configuration
-      mmf_setup.notebook_configuration.install_extensions()
 
 ======================
  Mercurial (hg) Tools
@@ -180,72 +195,21 @@ extensions`__ from `here`__::
 
 If you source the output of the ``mmf_setup`` script::
 
-   . mmf_setup
+   . mmf_setup -v
 
 then your ``HGRCPATH`` will be amended to include this projects
 ``hgrc`` file which does the following:
 
-1. Adds some useful extensions.
+1. Adds some useful extensions:
+
+   * ``evolve`` 
+   * ``topics`` 
+   * ``hg-git``
+     
 2. Adds the following commands:
 
    * ``hg lga`` (or ``hg lg``): provides a nice concise graphical
      display of the repo.
-   * ``hg cstatus`` (or ``hg cst``):
-   * ``hg cdiff``: same for ``hg diff``
-   * ``hg cediff``: same for ``hg ediff``
-   * ``hg crecord``: same for ``hg record``.  Note, this does not
-     function like commit - it will not record the notebooks with the
-     full output.
-   * ``hg ccommit`` (or ``hg ccom``): same for ``hg com`` but also
-     commits the full version of the notebooks with output as a new
-     node off the present node with the message ``..: Automatic commit of
-     output``.  This command has two behaviours depending on the
-     configuration option ``nbclean.output_branch``.  If this is not
-     set::
-
-       [nbclean]
-       output_branch =
-
-     then ``hg ccommit`` will commit a cleaned copy of your notebooks
-     with the output stripped, and then will commit the full notebook
-     with output (provided that the notebooks have output) as a new
-     head::
-
-       | o  4: test ...: Automatic commit with .ipynb output
-       |/
-       @  3: test ccommit 3
-       |
-       | o  2: test ...: Automatic commit with .ipynb output
-       |/
-       o  1: test ccommit 1
-       |
-       o  0: test commit 0
-
-     The parent will always be set to the clean node so that the output
-     commits can be safely stripped from your repository if you choose
-     not to keep them.
-
-     The other mode of operation can be enabled by specifying a name for
-     the output branch::
-
-       [nbclean]
-       output_branch = auto_output
-
-     This will merge the changes into a branch with the specified name::
-
-       | o  4: test ...: Automatic commit with .ipynb output (...) auto_output
-       |/|
-       @ |  3: test ccommit 3
-       | |
-       | o  2: test ...: Automatic commit with .ipynb output (...) auto_output
-       |/
-       o  1: test ccommit 1
-       |
-       o  0: test commit 0
-
-     This facilitates stripping the output ``hg strip 2`` for example
-     will remove all output.  It also allows you to track the changes in
-     the output.
 
 =================
  Developer Notes
@@ -253,16 +217,6 @@ then your ``HGRCPATH`` will be amended to include this projects
 
 There are a couple of subtle points here that should be mentioned.
 
-* I explored both ``(un)shelve`` and ``commit/strip`` versions of
-  saving the current state.  While the former allows for shorter
-  aliases, it can potentially trigger merges, so we use the latter.
-* I sometimes write commit hook.  These should only be run on the real
-  commit, so we define the alias ``_commit`` which will bypass the
-  hooks as `discussed here`__.
-* The list of files to strip is generated by ``hg status -man``.  This
-  only includes added or modified files.  This, if a notebook was
-  commited with output (using ``hg com``) then it will not be
-  stripped.
 * Our approach of ``. mmf_setup`` sets ``HGRCPATH`` but if this was
   not set before, then this will skip the default search.  As such, we
   insert ``~/.hgrc`` if ``HGRCPATH`` was not previously set.  This is
@@ -426,5 +380,4 @@ Notes
 Various notes about python, IPython, etc. are stored in the docs folder.
 
 __ http://jupyter.cs.brynmawr.edu/hub/dblank/public/Jupyter%20Help.ipynb#2.-Installing-extensions
-__ https://bitbucket.org/ipre/calico/downloads/
 

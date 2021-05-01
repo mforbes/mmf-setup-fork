@@ -28,16 +28,15 @@ do
             ;;
         smc|cocalc)
             hg="$(type -p hg)"
-            #if [[ -n "${hg}" ]];
-            #then
-		        #    hg_python="$(hg debuginstall -T'{pythonexe}')"
-            #    echo "Upgrading mercurial, hg-evolve, and hg-git for hg=${hg}..."
-            #    echo "${hg_python} -m pip install --upgrade --user mercurial hg-evolve hg-git"
-            #    ${hg_python} -m pip install --upgrade --user mercurial hg-evolve hg-git
-            #else
+            if [[ -n "${hg}" ]]; then
+		            hg_python="$(hg debuginstall -T'{pythonexe}')"
+                echo "Upgrading mercurial, hg-evolve, and hg-git for hg=${hg}..."
+                echo "${hg_python} -m pip install --upgrade --user mercurial hg-evolve hg-git"
+                ${hg_python} -m pip install --upgrade --user mercurial hg-evolve hg-git
+            else
                 echo "Installing mercurial, hg-evolve, and hg-git for python3..."
                 python3 -m pip install --upgrade --user mercurial hg-evolve hg-git
-            #fi
+            fi
             
             DATA_DIR="$(python -c 'import mmf_setup;print(mmf_setup.DATA)')"
             echo "Setting up config files for CoCalc..."
