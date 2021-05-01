@@ -89,7 +89,7 @@ class MyFormatter(logging.Formatter):
 
 def nbinit(
     theme="default",
-    hgroot=True,
+    set_path=True,
     toggle_code=False,
     debug=False,
     console_logging=True,
@@ -106,10 +106,9 @@ def nbinit(
     ---------
     theme : str
        Choose a theme.
-    hgroot : bool
-       If `True`, then add the root hg directory to the path so that top-level
-       packages can be imported without installation.  This is the path
-       returned by `hg root`.  This path is also stored as `mmf_setup.HGROOT`.
+    set_path : bool
+       If `True`, then call `mmf_setup.set_path.set_path()` to add the root directory to
+       the path so that top-level packages can be imported without installation.
     toggle_code : bool
        If `True`, then provide a function to toggle the visibility of input
        code.  (This should be replaced by an extension.)
@@ -181,13 +180,14 @@ def nbinit(
 
     message = _MESSAGE
 
-    if hgroot:
-        from .set_path import hgroot
+    if set_path:
+        from .set_path import set_path
 
-        if hasattr(hgroot, "HGROOT"):
-            message = message.replace(
-                "This cell", f"This cell adds HGROOT={hgroot.HGROOT} to your path and"
-            )
+        paths = set_path()
+
+        message = message.replace(
+            "This cell", f"This cell adds {list(map(str, paths))} to your path, and"
+        )
 
     # Message
     if not quiet:
