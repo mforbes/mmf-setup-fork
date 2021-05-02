@@ -4,9 +4,8 @@ makefiles_dir = .makefiles
 include $(makefiles_dir)/rst2html.mk
 
 # This gets the version of python that mercurial uses
-PYTHON="$$(shebang=$$(head -n1 $$(type -p hg));echo $${shebang:2})"
-PYTHON=python
-HG=`which hg`
+PYTHON=$(shell hg debuginstall -T'{pythonexe}')
+HG=$(shell which hg)
 MMF_SETUP=$(shell pwd)/src/mmf_setup
 MMF_SETUP=$(shell python -c "import os.path, mmf_setup;print(os.path.dirname(mmf_setup.__file__))")
 
@@ -23,19 +22,22 @@ test-cocalc:
 test-py:
 	pytest
 
+test-hg:
+	cd tests MMF_SETUP=$(MMF_SETUP) $(PYTHON) run-tests.py --with-hg=$(HG) test-hg*.t $(TESTFLAGS)
+
 test: test-hg test-py
 
 README_CHANGES.html: README.rst CHANGES.txt
 	cat $^ | rst2html.py > $@
 
 clean:
-	rm -rf .nox src/mmf_setup.egg-info
-	rm -rf tests/.testtimes
-	rm -rf .pytest_cache
-	rm -rf mmf_setup.egg-info
-	find . -name "*.pyc" -delete
-	find . -name "*.pyo" -delete
-	find . -name "__pycache__" -type d -delete
-	rm README_CHANGES.html
+	-rm -rf .nox src/mmf_setup.egg-info
+	-rm -rf tests/.testtimes
+	-rm -rf .pytest_cache
+	-rm -rf mmf_setup.egg-info
+	-find . -name "*.pyc" -delete
+	-find . -name "*.pyo" -delete
+	-find . -name "__pycache__" -type d -delete
+	-rm README_CHANGES.html
 
 .PHONY: help test-cocalc test-hg test-py test clean

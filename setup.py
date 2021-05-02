@@ -33,6 +33,8 @@ test_requires = [
     "pytest-flake8",
     "coverage",
     "mercurial",
+    "hg-evolve",
+    "hg-git",
     "twine",
     "docutils",
 ]

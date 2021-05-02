@@ -19,6 +19,13 @@
 
     * https://rise.readthedocs.io/en/stable/installation.html
     * https://github.com/ipython-contrib/jupyter_contrib_nbextensions
+  - Improved test isolation.
+  - Expanded options for mmf_setup.
+    - Mercurial configuration is now in two stages: ``hgrc.lga`` which gives the ``hg
+      lg`` command safely using only builtin modules, and ``hgrc.full`` which includes
+      this, and also activates the ``hg-git`` and ``evolve`` extensions.  This also
+      applies the ``update`` hook for including ``.hgrc`` files, but asks the user for
+      confirmation because this is a security risk.
     
 0.3.1:
   - Added `mmf_setup cocalc` initialization for CoCalc.com projects
