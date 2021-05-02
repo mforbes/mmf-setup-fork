@@ -4,9 +4,9 @@ This is a meta-package providing an easy way to initialize a python
 distribution to have the tools I commonly use.
 
 **Source:**
-  https://bitbucket.org/mforbes/mmf_setup
+  https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf-setup
 **Issues:**
-  https://bitbucket.org/mforbes/mmf_setup/issues
+  https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf-setup/issues
 """
 import io
 from glob import glob
