@@ -91,7 +91,7 @@ In particular, I structure it for the following use-cases:
      mmf_setup cocalc
 
      # OR install from a particular version of the sources.
-     pip install --user hg+https://hg.iscimath.org/mforbes/mmf_setup@0.3.1
+     pip install --user hg+https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf-setup@0.3.1
      mmf_setup cocalc
 
 2. Initial setup of a python distribution on a new computer.  This is a little more
@@ -125,7 +125,7 @@ In particular, I structure it for the following use-cases:
 
    * **From Source**
 
-     ``python3 -m pip install --user hg+https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf_setup[nbextensions]``
+     ``python3 -m pip install --user hg+https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf-setup[nbextensions]``
 
    * **From Local Source** (*Run this from the source directory after you unpack it.*)
 
