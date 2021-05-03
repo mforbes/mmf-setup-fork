@@ -1,4 +1,4 @@
-# Much of tis configuration comes from
+# Some of this configuration comes from
 # https://octobus.net/blog/2020-11-26-modern-mercurial.html
 [ui]
 tweakdefaults = true
@@ -10,46 +10,11 @@ mergemarkers = detailed
 # side of the merge and one for the base content.
 merge = :merge3
 
-ccommit.verbose = true
-
-[commands]
-# Require the user to pass a revision (or revset) to "push" instead of pushing
-# all heads by default.
-push.require-revs = true
-
-[paths]
-# Default to the current revision (`.`) when pushing to `default`. 
-default:pushrev = .
-
 [extensions]
 # ==== "Core" extensions ====
 # Extensions that come pre-packaged with Mercurial:
 
 color=
-histedit=
-rebase=
-record=
-shelve=
-strip=
-
-# Automatically finds where to amend the different bits of your working
-# directory into the right changesets and does so interactively.
-absorb =
-
-# These need pip install --user hg-evolve
-evolve =
-topic =
-
-mmf_setup.nbclean=$MMF_SETUP/nbclean.py
-
-[hooks]
-# This hook adds "%include ../.hgrc" to .hg/hgrc if the .hgrc file exists in
-# the top level.  This allows one to store a set of paths for example.
-# See http://stackoverflow.com/a/24195392/1088938
-update = if [ -e .hgrc ] && touch .hg/hgrc \
-                         && ! grep -q '%include \.\./\.hgrc' .hg/hgrc; then \
-           echo '%include ../.hgrc' >> .hg/hgrc; \
-         fi
 
 [alias]
 lga = log -G --template={lg_changeset} -l20
@@ -58,8 +23,6 @@ checkpoint = !$HG commit -m "CHK: Automatic checkpoint" && \
     $HG debugsetparents .^1 && \
     $HG debugrebuildstate
 chk = checkpoint
-
-cediff  = !hg nbclean && { hg ediff  "$@"; hg nbrestore; }
 
 # Template styling tricks:
 # http://jamie-wong.com/2012/07/11/my-mercurial-setup-and-workflow-at-khan-academy

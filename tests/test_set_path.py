@@ -1,83 +1,132 @@
 import copy
-
-try:
-    from importlib import reload
-except ImportError:
-    pass
-
-import os.path
+import importlib
+import os
+from pathlib import Path
 import shutil
 import subprocess
 import sys
 import tempfile
-
-import mmf_setup.set_path.hgroot
+import warnings
 
 import pytest
+
+_pyproject_toml = """
+[tool.mmf_setup]
+ROOT = "{root}"
+"""
+
+_setup_cfg = """
+[mmf_setup]
+ROOT = {root}
+"""
 
 
 @pytest.fixture()
 def tmpdir():
     """Provides a temporary directory for testing."""
     tmpdir = tempfile.mkdtemp()
-    yield tmpdir
+    yield Path(tmpdir)
     shutil.rmtree(tmpdir)
 
 
-def test_set_path_hgroot():
-    HGROOT = subprocess.check_output(["hg", "root"]).strip().decode("utf8")
-    while HGROOT in sys.path:
-        sys.path.remove(HGROOT)
+@pytest.fixture()
+def mmf_setup():
+    """Return the mmf_setup module, but ensure that ROOT is deleted."""
+    mmf_setup = importlib.import_module("mmf_setup")
+    if hasattr(mmf_setup, "ROOT"):
+        del mmf_setup.ROOT
+    yield mmf_setup
 
-    reload(mmf_setup.set_path.hgroot)
-    assert HGROOT == sys.path[0]
-    assert mmf_setup.HGROOT == HGROOT
+
+@pytest.fixture(params=[("pyproject.toml", _pyproject_toml), ("setup.cfg", _setup_cfg)])
+def config_file_info(request):
+    yield request.param
 
 
-def test_set_path_from_file_empty_path(tmpdir):
-    import mmf_setup.set_path
+def test_set_path_hgroot(recwarn, mmf_setup):
+    """Test deprecated import `mmf_setup.set_path.hgroot`"""
+    assert not hasattr(mmf_setup, "ROOT")
+    hgroot = importlib.import_module("mmf_setup.set_path.hgroot")
+    warnings.simplefilter("always")
+    importlib.reload(hgroot)
+    assert len(recwarn) == 1
+    assert recwarn.pop(DeprecationWarning)
 
+    assert Path(sys.path[0]).resolve() == Path(mmf_setup.ROOT).resolve()
+
+
+def test_set_ROOT(tmpdir, mmf_setup):
     mmf_setup.ROOT = tmpdir
+    mmf_setup.set_path(cwd=tmpdir)
+    assert mmf_setup.ROOT == tmpdir
+    assert sys.path[0] == str(tmpdir)
 
-    assert tmpdir not in sys.path
+    mmf_setup.ROOT = tmpdir / "DOES_NOT_EXIST"
+    mmf_setup.set_path(cwd=tmpdir / "DOES_NOT_EXIST")
+    assert not hasattr(mmf_setup, "ROOT")
 
-    original_path = copy.deepcopy(sys.path)
+    # Not sure if this is what we want... but it is probably too much to expect cleanup
+    assert sys.path[0] == str(tmpdir)
 
-    def run_test(
-        paths=[],
-        section="mmf_setup",
-        filename="setup.cfg",
-        expected_paths=None,
-        check=False,
-    ):
-        sys.path = copy.deepcopy(original_path)
-        with open(os.path.join(tmpdir, filename), "w") as f:
-            f.write("[{}]\n".format(section))
-            if paths:
-                f.write("paths = " + paths[0] + "\n")
-                for path in paths[1:]:
-                    f.write("        " + path + "\n")
 
-        vargs = ()
-        if filename != "setup.cfg":
-            vargs = (filename,)
+def test_set_path_config(tmpdir, config_file_info, mmf_setup):
+    root = tmpdir / "A"
+    cwd = root / "B"
+    os.makedirs(cwd)
 
-        mmf_setup.set_path.set_path_from_file(*vargs, check=check)
+    config_filename, config_template = config_file_info
+    config_file = tmpdir / config_filename
+    config_contents = config_template.format(root=root)
 
-        if expected_paths is not None:
-            paths = expected_paths
+    # Wrong filename
+    with open(tmpdir / ("f" + config_filename), "w") as f:
+        f.write(config_contents)
 
-        expected_paths = []
-        for path in paths:
-            if not os.path.isabs(path):
-                path = os.path.join(tmpdir, path)
-            expected_paths.append(os.path.abspath(path))
+    mmf_setup.set_path(cwd=cwd)
+    assert not hasattr(mmf_setup, "ROOT")
 
-        assert sys.path == expected_paths + original_path
+    # Wrong section.  This will set ROOT to tmpdir where the config file is, not to root.
+    with open(config_file, "w") as f:
+        f.write(config_contents.replace("mmf_setup", "mmf_settup"))
 
-    run_test(paths=["src1"], filename="setup1.cfg")
-    run_test(paths=[], expected_paths=["."])
-    run_test(paths=["."])
-    run_test(paths=[".", "src"])
-    run_test(paths=[".", "src"], section="mmf_setup_mispelled", expected_paths=[tmpdir])
-    run_test(paths=[".   # comment ignored"], expected_paths=["."])
+    mmf_setup.set_path(cwd=cwd)
+    assert Path(mmf_setup.ROOT).resolve() == tmpdir.resolve()
+    assert Path(mmf_setup.ROOT).resolve() != root.resolve()
+    del mmf_setup.ROOT
+
+    # Wrong spelling.  This will set ROOT to tmpdir where the config file is, not to root.
+    with open(config_file, "w") as f:
+        f.write(config_contents.replace("ROOT", "ROOTT"))
+
+    mmf_setup.set_path(cwd=cwd)
+    assert Path(mmf_setup.ROOT).resolve() == tmpdir.resolve()
+    assert Path(mmf_setup.ROOT).resolve() != root.resolve()
+    del mmf_setup.ROOT
+
+    # Now do it for real.
+    with open(config_file, "w") as f:
+        f.write(config_contents)
+
+    mmf_setup.set_path(cwd=cwd)
+    assert Path(mmf_setup.ROOT).resolve() == root.resolve()
+    assert Path(sys.path[0]).resolve() == root.resolve()
+
+
+def test_set_path_toml_precedence(tmpdir, mmf_setup):
+    """Check that pyproject.toml has precedence over setup.cfg"""
+    root_toml = tmpdir / "A" / "R"
+    root_cfg = tmpdir / "A"
+    cwd = tmpdir / "A" / "B"
+    os.makedirs(root_toml)
+    os.makedirs(cwd)
+
+    toml_info = tmpdir / "pyproject.toml", _pyproject_toml.format(root=root_toml)
+    cfg_info = tmpdir / "setup.cfg", _setup_cfg.format(root=root_cfg)
+
+    for _file, _contents in [toml_info, cfg_info]:
+        with open(_file, "w") as f:
+            f.write(_contents)
+
+    mmf_setup.set_path(cwd=cwd)
+    assert Path(mmf_setup.ROOT).resolve() == root_toml.resolve()
+    assert Path(sys.path[0]).resolve() == root_toml.resolve()

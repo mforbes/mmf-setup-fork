@@ -1,5 +1,5 @@
 {% set name = "mmf_setup" %}
-{% set version = "0.3.1" %}
+{% set version = "0.4.0" %}
 
 package:
   name: "{{ name|lower }}"
@@ -19,11 +19,8 @@ requirements:
   host:
     - python >=3
     - setuptools
-    - nbstripout >=0.2.0
   run:
     - python >=3
-    - nbstripout >=0.2.0
-    - python-hglib
 
 test:
   source_files:
@@ -39,15 +36,16 @@ test:
     - pytest-cov >=2.2.0
     - pytest-flake8
     - mercurial >=5.2
+    - hg-evolve
   commands:
     - make test
 
 about:
   home: https://pypi.org/project/mmf-setup/
-  # https://bitbucket.org/mforbes/mmf_setup
-  license: GNU General Public v3 or later (GPLv3+)
-  license_family: GPL3
+  license: BSD-3
+  license_family: BSD-3
   license_file: LICENSE.txt
   summary: Python Tools
   doc_url: https://pypi.org/project/mmf-setup/
-  dev_url:
+  dev_url: https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf-setup
+
