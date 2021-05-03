@@ -16,6 +16,9 @@ from os.path import basename, dirname, join, splitext
 import sys
 
 from setuptools import setup, find_packages
+import setuptools
+
+print(setuptools.__version__)
 
 NAME = "mmf_setup"
 
@@ -24,7 +27,7 @@ install_requires = [
     "python-hglib",
     "hg-evolve",
     "tomlkit",
-    "importlib-metadata ; python <'3.8'",
+    "importlib-metadata",
 ]
 
 test_requires = [
@@ -65,8 +68,8 @@ def read(*names, **kwargs):
         return fh.read()
 
 
-# Get the long description from the README.rst file
-LONG_DESCRIPTION = "\n".join([read("README.rst"), read("CHANGES.txt")])
+# Get the long description from the README.md file
+LONG_DESCRIPTION = "\n".join([read("README.md"), read("CHANGES.txt")])
 
 
 setup(
