@@ -24,6 +24,7 @@ install_requires = [
     "python-hglib",
     "hg-evolve",
     "tomlkit",
+    "importlib-metadata ; python <'3.8'",
 ]
 
 test_requires = [
@@ -70,7 +71,7 @@ LONG_DESCRIPTION = "\n".join([read("README.rst"), read("CHANGES.txt")])
 
 setup(
     name=NAME,
-    version="0.3.1",
+    version="0.4.0.dev",
     packages=find_packages("src"),
     package_dir={"": "src"},
     py_modules=[splitext(basename(_path))[0] for _path in glob("src/*.py")],

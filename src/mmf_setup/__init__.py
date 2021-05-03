@@ -1,11 +1,19 @@
 import os.path
 
+try:
+    from importlib import metadata
+except ImportError:
+    import importlib_metadata as metadata
+
 from .notebook_configuration import nbinit
 from .set_path import set_path
 
+__version__ = metadata.version(__name__)
+
 __all__ = [
     "nbinit",
-    "set_path" "MMF_SETUP",
+    "set_path",
+    "MMF_SETUP",
     "DATA",
     "HGTHEMES",
     "NBTHEMES",
