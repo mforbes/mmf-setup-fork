@@ -23,9 +23,6 @@ print(setuptools.__version__)
 NAME = "mmf_setup"
 
 install_requires = [
-    "nbstripout>=0.2.0",
-    "python-hglib",
-    "hg-evolve",
     "tomlkit",
     "importlib-metadata",
 ]
@@ -69,12 +66,12 @@ def read(*names, **kwargs):
 
 
 # Get the long description from the README.md file
-LONG_DESCRIPTION = "\n".join([read("README.md"), read("CHANGES.txt")])
+LONG_DESCRIPTION = "\n".join([read("README.md"), read("CHANGES.md")])
 
 
 setup(
     name=NAME,
-    version="0.4.0.dev",
+    version="0.4.0",
     packages=find_packages("src"),
     package_dir={"": "src"},
     py_modules=[splitext(basename(_path))[0] for _path in glob("src/*.py")],
@@ -90,7 +87,7 @@ setup(
     url="https://bitbucket.org/mforbes/mmf_setup",
     description="Python Tools",
     long_description=LONG_DESCRIPTION,
-    long_description_content_type="text/x-rst",
+    long_description_content_type="text/markdown",
     license="GNU GPLv2 or any later version",
     classifiers=[
         # How mature is this project? Common values are
