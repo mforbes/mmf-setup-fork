@@ -30,6 +30,12 @@ test: test-hg test-py
 README_CHANGES.html: README.rst CHANGES.txt
 	cat $^ | rst2html.py > $@
 
+%.html: %.rst
+	rst2html5.py $< > $@
+
+%.html: %.md
+	pandoc $< -o $@ --standalone 
+
 clean:
 	-rm -rf .nox src/mmf_setup.egg-info
 	-rm -rf tests/.testtimes

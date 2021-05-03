@@ -87,11 +87,11 @@ In particular, I structure it for the following use-cases:
    initialization.  With this project, it is simply a matter of using |pip|_ to install
    this package, and then using some of the tools. Specifically::
 
-     pip install --user mmf_setup
+     python3 -m pip install --user mmf-setup
      mmf_setup cocalc
 
      # OR install from a particular version of the sources.
-     pip install --user hg+https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf-setup@0.3.1
+     python3 -m pip install --user hg+https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf-setup@0.4.0
      mmf_setup cocalc
 
 2. Initial setup of a python distribution on a new computer.  This is a little more
@@ -121,7 +121,7 @@ In particular, I structure it for the following use-cases:
   
    * **Directly from PyPI**
 
-     ``python3 -m pip install --user mmf_setup[nbextensions]``
+     ``python3 -m pip install --user mmf-setup[nbextensions]``
 
    * **From Source**
 

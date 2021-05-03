@@ -14,14 +14,8 @@ Usage:
 This module provides customization for Jupyter notebooks including
 styling and some pre-defined MathJaX macros.
 """
-import importlib
 import logging
 import os.path
-import shutil
-import subprocess
-import sys
-import tempfile
-import traceback
 
 try:
     from IPython.display import HTML, Javascript, display, clear_output
@@ -107,7 +101,7 @@ def nbinit(
     theme : str
        Choose a theme.
     set_path : bool
-       If `True`, then call `mmf_setup.set_path.set_path()` to add the root directory to
+       If `True`, then call `mmf_setup.set_path()` to add the root directory to
        the path so that top-level packages can be imported without installation.
     toggle_code : bool
        If `True`, then provide a function to toggle the visibility of input
@@ -198,72 +192,3 @@ def nbinit(
 
     if debug:
         return res
-
-
-######################################################################
-# Old stuff.  This was the old way of installing things.  There are
-# also some additional goodies here that should be included above
-# after testing.
-def run_with_bash(cmds):
-    """Execute the specified commands with a shell.
-
-    Note each command should be a list of strings as required by subprocess.
-
-    Example
-    -------
-    >>> res = run_with_bash([['echo', 'hello!']])
-    Running: echo hello!
-    """
-    for cmd in cmds:
-        print("Running: {}".format(" ".join(cmd)))
-        try:
-            subprocess.check_call(cmd)
-        except Exception:
-            traceback.print_exc()
-
-
-class Install(object):
-    """
-    Use this as a context::
-
-        with Install() as install:
-            install.install_all()
-    """
-
-    def __init__(self, ipython_dir=None, user=True):
-        """Installs various notebook extensions etc.
-
-        Arguments
-        ---------
-        ipython_dir : str, None
-           If provided, then the install is performed here, otherwise
-           the install takes place in the default ipython_dir location.
-        user : bool
-           If `True`, then install in the user's ipython_dir,
-           otherwise install in the system location.  This simply
-           passes the `--user` flag to ipython.
-        """
-        self.ipython_dir = ipython_dir
-        self.user = user
-        self.old_ipython_dir = None
-
-    def install_nbextension(self, name):
-        import notebook
-
-        notebook.install_nbextension(name, user=self.user)
-
-    def __enter__(self):
-        """Set the IPYTHONDIR environment variable."""
-        # Use environment because --ipython-dir does not always work
-        # https://github.com/ipython/ipython/issues/8138
-        if self.ipython_dir is not None:
-            if "IPYTHONDIR" in os.environ:
-                self.old_ipython_dir = os.environ["IPYTHONDIR"]
-            os.environ["IPYTHONDIR"] = self.ipython_dir
-        return self
-
-    def __exit__(self, type, value, tb):
-        if self.old_ipython_dir is not None:
-            os.environ["IPYTHONDIR"] = self.old_ipython_dir
-
-        return type is not None

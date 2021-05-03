@@ -52,7 +52,7 @@ With CI setup, we have the following badges:
 
 [drone_badge]: <https://cloud.drone.io/api/badges/forbes-group/mmf-setup/status.svg>
 [drone]: https://cloud.drone.io/forbes-group/mmf-setup
-[ci_badge]: <https://github.com/mforbes/mmf-setup-fork/actions/workflows/tests.yml/badge.svg?branch=topic%2F0.6.0%2Fgithub_ci>
+[ci_badge]: <https://github.com/mforbes/mmf-setup-fork/actions/workflows/tests.yml/badge.svg>
 [ci]: <https://github.com/mforbes/mmf-setup-fork/actions/workflows/tests.yml>
 
 [black]: https://github.com/psf/black
