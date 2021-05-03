@@ -126,8 +126,7 @@ revision numbers etc. for release 0.1.11.)
         twine check dist/mmf_setup-*
         twine upload dist/mmf_setup-*
 
-10. Pull the merge from bitbucket to your development machine but **do
-    not update**.
+10. Pull the merge from Heptapod to your development machine but **do not update**.
 11. Update the version in `setup.py` and `meta.yaml` to `'0.1.12dev'` or
     whatever is relevant.
 12. From the previous commit (the last commit on branch `0.1.11` in this
