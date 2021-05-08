@@ -64,13 +64,14 @@ def set_root(cwd="."):
 
 
 def set_path(cwd="."):
-    """Set root and insert root at start of sys.path."""
+    """Set root, insert root at start of sys.path, and return root."""
     root = set_root(cwd=cwd)
     if root:
         root = str(Path(root))
         if root in sys.path:
             sys.path.remove(root)
         sys.path.insert(0, root)
+    return root
 
 
 def get_root(cwd="."):
