@@ -35,7 +35,7 @@ if [[ -n $1 ]]; then
     case $1 in
         -v)
             shift # move to the next argument
-            echo "mmf_setup environment:"
+            echo "# mmf_setup environment:"
             echo "$(mmf_setup_bash.py $*)"
             exit 0
             ;;

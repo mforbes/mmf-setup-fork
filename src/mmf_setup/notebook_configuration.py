@@ -177,11 +177,12 @@ def nbinit(
     if set_path:
         from .set_path import set_path
 
-        paths = set_path()
+        path = set_path()
+        if path:
 
-        message = message.replace(
-            "This cell", f"This cell adds {list(map(str, paths))} to your path, and"
-        )
+            message = message.replace(
+                "This cell", f"This cell adds {path} to your path, and"
+            )
 
     # Message
     if not quiet:
