@@ -52,6 +52,50 @@ alerts](https://img.shields.io/lgtm/alerts/g/mforbes/mmf-setup-fork.svg?logo=lgt
 Releases
 --------
 
+To prepare for release, make sure you are running in a development environment with the
+Mercurial evolve and topics extensions enabled, and with [Black] and [Nox].
+
+1. Start a development branch and topic:
+
+   ```bash
+   hg branch 0.4
+   hg topic 0.4.0
+   ```
+
+2. Change the version number in `setup.py` to `0.4.0.dev0` and commit this:
+
+   ```bash
+   hg com -m "BRN: Start working on branch 0.4"
+   hg push --new-branch -r .
+   ```
+
+3. Complete your changes making sure code is well tested etc. While working on specific
+   features, you should always use topics.
+   
+   When you push to Heptapod, the commits in these topics will remain in the draft
+   phase, allowing you to rebase, etc. as needed to clean the history. We have setup
+   automatic pushes to GitHub and you can see the status of the tests with the badge:
+   [![Tests][ci_badge]][ci].
+
+   To run the tests locally, you should be able to just run:
+   
+   ```bash
+   nox
+   ```
+4. Once everything is working and tested, push it to Heptapod and create Merge Requests
+   as needed.  First merge all open topics to the development branch, then change the
+   revision in `setup.py` to `'0.4.0'`, dropping the `'.dev'`.  Push this to Heptapod
+   and create a merge request to merge this to the default branch. 
+   
+   Review the changes and fix as needed.
+
+*Unlike previously, do not close the branch. Just leave it.*
+   
+
+   
+Start work on next branch:
+   
+   
 **PyPi**
 
 To release a new version be sure to do the following. (The examples use

@@ -72,3 +72,8 @@ cmd.ediff = ediff
 [merge-tools]
 emerge.args = $local $other $base $output
 emerge.premerge = True
+
+[commands]
+# The following prevents update from triggering a merge conflict.
+# https://stackoverflow.com/questions/22392001
+update.check = noconflict

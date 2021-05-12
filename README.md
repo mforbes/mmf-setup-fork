@@ -1,5 +1,3 @@
-% mmf-setup
-
 mmf-setup
 =========
 

@@ -30,6 +30,14 @@ def tmpdir():
 
 
 @pytest.fixture()
+def cwd():
+    """Make sure cwd exists.  (Uses the tests folder)."""
+    cwd = Path(__file__).resolve().parents[0]
+    os.chdir(cwd)
+    yield cwd
+
+
+@pytest.fixture()
 def mmf_setup():
     """Return the mmf_setup module, but ensure that ROOT is deleted."""
     mmf_setup = importlib.import_module("mmf_setup")
@@ -43,9 +51,10 @@ def config_file_info(request):
     yield request.param
 
 
-def test_set_path_hgroot(recwarn, mmf_setup):
+def test_set_path_hgroot(recwarn, mmf_setup, cwd):
     """Test deprecated import `mmf_setup.set_path.hgroot`"""
     assert not hasattr(mmf_setup, "ROOT")
+    warnings.simplefilter("ignore")
     hgroot = importlib.import_module("mmf_setup.set_path.hgroot")
     warnings.simplefilter("always")
     importlib.reload(hgroot)
@@ -130,3 +139,16 @@ def test_set_path_toml_precedence(tmpdir, mmf_setup):
     mmf_setup.set_path(cwd=cwd)
     assert Path(mmf_setup.ROOT).resolve() == root_toml.resolve()
     assert Path(sys.path[0]).resolve() == root_toml.resolve()
+
+
+def test_no_cwd(mmf_setup):
+    cwd = os.getcwd()
+    try:
+        tmpdir = tempfile.mkdtemp()
+        os.chdir(tmpdir)
+        shutil.rmtree(tmpdir)
+        with pytest.raises(FileNotFoundError):
+            os.getcwd()
+        mmf_setup.set_path()
+    finally:
+        os.chdir(cwd)

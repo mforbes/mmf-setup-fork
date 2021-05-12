@@ -120,7 +120,13 @@ def get_root_dirs(cwd="."):
 
     root_dirs = []
 
-    for root_dir in (Path(cwd) / "placeholder").resolve().parents:
+    try:
+        parents = (Path(cwd) / "placeholder").resolve().parents
+    except FileNotFoundError:
+        # Happens if cwd is not a valid directory for example...
+        return root_dirs
+
+    for root_dir in parents:
         config_files = [
             config_file
             for _file in _CONFIG_FILES
