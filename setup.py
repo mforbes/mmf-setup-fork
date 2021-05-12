@@ -71,7 +71,7 @@ LONG_DESCRIPTION = "\n".join([read("README.md"), read("CHANGES.md")])
 
 setup(
     name=NAME,
-    version="0.4.0",
+    version="0.4.1.dev",
     packages=find_packages("src"),
     package_dir={"": "src"},
     py_modules=[splitext(basename(_path))[0] for _path in glob("src/*.py")],
