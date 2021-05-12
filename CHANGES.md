@@ -1,6 +1,14 @@
 Changes
 =======
 
+## 0.4.1
+
+- Make `mmf_setup -v` output clean so that we can `eval "$(mmf_setup -v)"` rather than
+  sourcing. *In the future we will make this a python file, so `eval` will be the only
+  option.*
+- Fixed issues with `nbinit()` failing with not paths defined.
+- Added more tests.
+
 ## 0.4.0
 
 - Resolves issue #23: Drop support of nbclean mercurial extension (to hard to

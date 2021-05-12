@@ -55,19 +55,25 @@ Releases
 To prepare for release, make sure you are running in a development environment with the
 Mercurial evolve and topics extensions enabled, and with [Black] and [Nox].
 
-1. Start a development branch and topic:
+1.  Work on a development branch and topic.  Use branches for minor revisions, but not
+    patches.  I.e. we will have a 0.4 branch, with patches 0.4.0, 0.4.1, etc.  As we
+    develop patches, we stay on the same branch, so if you are just working on a new
+    patch, then you will only need to update the topic.
 
-   ```bash
-   hg branch 0.4
-   hg topic 0.4.0
-   ```
+    ```bash
+    hg up 0.4         # Run hg branch 0.4 if needed, but this should exist.
+    hg topic 0.4.1
+    ```
+   
+    *(Note: This step was probably done at the end of the previous release... see below.)*
 
-2. Change the version number in `setup.py` to `0.4.0.dev0` and commit this:
+2.  Change the version number in `setup.py` to `0.4.1.dev0` and commit this:
 
-   ```bash
-   hg com -m "BRN: Start working on branch 0.4"
-   hg push --new-branch -r .
-   ```
+    ```bash
+    hg com -m "VER: 0.4.1"
+    ```
+
+    *(Note: This step was probably done at the end of the previous release... see below.)*
 
 3. Complete your changes making sure code is well tested etc. While working on specific
    features, you should always use topics.
@@ -82,18 +88,72 @@ Mercurial evolve and topics extensions enabled, and with [Black] and [Nox].
    ```bash
    nox
    ```
+   
+   (INCOMPLETE) Also check the documentation.  *The `docs` directory contains some old
+   documentation and we have code in `.makefiles` to convert this to HTML.  This needs
+   updating and cleanup.  The official package documentation is in the `README.md` file
+   which we discuss below.*
+   
 4. Once everything is working and tested, push it to Heptapod and create Merge Requests
    as needed.  First merge all open topics to the development branch, then change the
-   revision in `setup.py` to `'0.4.0'`, dropping the `'.dev'`.  Push this to Heptapod
+   revision in `setup.py` to `'0.4.1'`, dropping the `'.dev0'`.  Push this to Heptapod
    and create a merge request to merge this to the default branch. 
    
    Review the changes and fix as needed.
 
-*Unlike previously, do not close the branch. Just leave it.*
-   
+5. Add notes about the changes in `CHANGES.md`.  *(These should be apparent from the review.)*
 
+6. Check that the documentation looks okay:
+
+   ```bash
+   make README_CHANGES.html
+   open README_CHANGES.html
+   make clean
+   ```
+
+7. Try uploading your package to `pypi` with `twine`:
+
+   ```bash
+   python setup.py sdist bdist_wheel
+   twine check dist/mmf_setup-*
+   twine upload dist/mmf_setup-*
+   ```
+
+8. If this works, then complete the Merge Request into the default branch with a commit
+   message starting: `"REL: 0.4.0"`.  *Unlike previously, do not close the branch. Just leave it
+   open so it can be found.*
    
-Start work on next branch:
+9. Pull in these changes, but do not update.  You should be on the development branch,
+   something like this:
+   
+   ```bash
+   $ hg pull
+   ...
+   $ hg lg
+   o    214:p m (13 hours ago)  0.4.1
+   |\    REL: 0.4.1
+   | @  213:p michael (13 hours ago) 0.4
+   | |   TST: Working tests.  Ready for release.
+   | o  212:p michael (3 days ago) 0.4
+   | |   Add comment to mmf_setup -v output so it can be evaled.
+   ...
+   ```
+
+10. Tag the release:
+
+   ```bash
+   $ hg tag -r 214 0.4.1
+   ```
+
+11. Start work on next release.  Edit `setup.py` to set the version to `'0.4.1.dev0'`, then commit.
+
+   ```bash
+   hg pull
+   hg push --new-branch -r .
+   #hg branch 0.4  # If needed... not needed for minor versions.
+   hg topic 0.4.1
+   hg com -m "BRN: 0.4.1 Start working on new release"
+   ```
    
    
 **PyPi**
@@ -170,8 +230,7 @@ revision numbers etc. for release 0.1.11.)
         twine check dist/mmf_setup-*
         twine upload dist/mmf_setup-*
 
-10. Pull the merge from bitbucket to your development machine but **do
-    not update**.
+10. Pull the merge from Heptapod to your development machine but **do not update**.
 11. Update the version in `setup.py` and `meta.yaml` to `'0.1.12dev'` or
     whatever is relevant.
 12. From the previous commit (the last commit on branch `0.1.11` in this

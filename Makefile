@@ -30,6 +30,10 @@ test: test-hg test-py
 %.html: %.md
 	pandoc $< -o $@ --standalone
 
+auto:
+	pandoc $< -o $@ --standalone && open -g -a Safari $@
+	fswatch -e ".*\.html" -o . | while read num ; do pandoc $< -o $@ --standalone && open -g -a Safari $@; done
+
 %.html: %.rst
 	rst2html5.py $< > $@
 
@@ -47,4 +51,4 @@ clean:
 	-rm README_CHANGES.*
 	-rm Notes.html
 
-.PHONY: help test-cocalc test-hg test-py test clean
+.PHONY: help test-cocalc test-hg test-py test clean auto
