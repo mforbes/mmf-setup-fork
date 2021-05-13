@@ -65,28 +65,29 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
                 #     fi
                 # else
                     echo "# Installing mercurial, hg-evolve, and hg-git for python3..."
-                    echo "python3 -m pip install --upgrade --user mercurial hg-evolve hg-git"
+                    echo "python3 -m pip install --upgrade --user mercurial hg-evolve hg-git jupytext"
                     if [[ $not_dry_run ]]; then
-                        python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git
+                        python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
                     fi
                 #fi
 
                 DATA_DIR="$(python -c 'import mmf_setup;print(mmf_setup.DATA)')"
                 echo "# Setting up config files for CoCalc..."
                 if [[ $not_dry_run ]]; then
+                    if [[ ! -L ~/.bashrc && -f ~/.bashrc ]]; then
+                       echo "mv ~/.bashrc ~/.bashrc_cocalc"
+                       mv ~/.bashrc ~/.bashrc_cocalc
+                    fi
                     echo "$BIN_DIR/mmf_initial_setup" -v "$DATA_DIR/config_files/cocalc" $*
                     "$BIN_DIR/mmf_initial_setup" -v "$DATA_DIR/config_files/cocalc" $*
                 else
+                    if [[ ! -L ~/.bashrc && -f ~/.bashrc ]]; then
+                       echo "mv ~/.bashrc ~/.bashrc_cocalc"
+                    fi
                     "$BIN_DIR/mmf_initial_setup" --no-action -v "$DATA_DIR/config_files/cocalc" $*
                 fi
                 cat "$DATA_DIR/config_files/cocalc/message.txt"
 
-                # Upgrade jupytext
-                echo "# Upgrading jupytext for python3..."
-                echo "python3 -m pip install --upgrade --user jupytext"
-                if [[ $not_dry_run ]]; then
-                    python3 -m pip install --upgrade --user jupytext
-                fi
                 exit 0
                 ;;
             -h)
