@@ -7,26 +7,28 @@
 #      https://alum.mit.edu/www/mforbes/public/notes/cocalc-workflow/
 
 function usage() {
-    echo "usage: mmf_setup cocalc [options] OR mmf_setup -v [options] OR source mmf_setup [options]"
+    echo "usage: mmf_setup cocalc [options] OR mmf_setup -v [options]"
     echo
     echo "The first invocation will setup cocalc.com projects:"
     echo
-    echo "   mmf_setup cocalc [options]"
+    echo "   mmf_setup cocalc [-v] [options]"
     echo
     echo "Additional options are passed to mmf_initial_setup.  For more info run"
     echo
     echo "   mmf_initial_setup -h"
     echo
-    echo "The second invocation will show which environmental variables will be set:"
+    echo "The second invocation will show which environmental variables will be set,"
+    echo "and can be evaluated to set these in your shell:"
     echo
     echo "   mmf_setup -v [options]"
-    echo
-    echo "The third invocation will actually set this in your shell by running mmf_setup_bash.py:"
-    echo
-    echo "   source mmf_setup [options]   OR . mmf_setup [options]"
+    echo '   eval "$(mmf_setup -v [options])"'
     echo
     echo "Valid options for mmf_setup_bash.py are:"
-    echo "$(mmf_setup_bash.py -h)"    
+    echo "$(mmf_setup_bash.py -h)"
+    echo
+    echo "(Deprecated) You can set these in your shell by running mmf_setup_bash.py:"
+    echo
+    echo "   source mmf_setup [options]   OR . mmf_setup [options]"
 }
 
 BIN_DIR="$(dirname $BASH_SOURCE{0})"
@@ -40,32 +42,52 @@ if [[ -n $1 ]]; then
             exit 0
             ;;
         smc|cocalc)
+            shift # move to the next argument
+            if [[ $1 == -v ]]; then
+                shift # move to the next argument
+                not_dry_run=
+            else
+                not_dry_run=true
+            fi
+
+               
             hg="$(type -p hg)"
             if [[ -n "${hg}" ]]; then
 		            hg_python="$(hg debuginstall -T'{pythonexe}')"
-                echo "Upgrading mercurial, hg-evolve, and hg-git for hg=${hg}..."
+                echo "# Upgrading mercurial, hg-evolve, and hg-git for hg=${hg}..."
                 echo "${hg_python} -m pip install --upgrade --user mercurial hg-evolve hg-git"
-                ${hg_python} -m pip install --upgrade --user mercurial hg-evolve hg-git
+                if [[ $not_dry_run ]]; then
+                    ${hg_python} -m pip install --upgrade --user mercurial hg-evolve hg-git
+                fi
             else
-                echo "Installing mercurial, hg-evolve, and hg-git for python3..."
-                python3 -m pip install --upgrade --user mercurial hg-evolve hg-git
+                echo "# Installing mercurial, hg-evolve, and hg-git for python3..."
+                echo "python3 -m pip install --upgrade --user mercurial hg-evolve hg-git"
+                if [[ $not_dry_run ]]; then
+                    python3 -m pip install --upgrade --user mercurial hg-evolve hg-git
+                fi
             fi
             
             DATA_DIR="$(python -c 'import mmf_setup;print(mmf_setup.DATA)')"
-            echo "Setting up config files for CoCalc..."
-            shift # move to the next argument
-            "$BIN_DIR/mmf_initial_setup" \
-                 -v "$DATA_DIR/config_files/cocalc" $*
+            echo "# Setting up config files for CoCalc..."
+            if [[ $not_dry_run ]]; then
+                echo "$BIN_DIR/mmf_initial_setup" -v "$DATA_DIR/config_files/cocalc" $*
+                "$BIN_DIR/mmf_initial_setup" -v "$DATA_DIR/config_files/cocalc" $*
+            else
+                "$BIN_DIR/mmf_initial_setup" --no-action -v "$DATA_DIR/config_files/cocalc" $*
+            fi
             cat "$DATA_DIR/config_files/cocalc/message.txt"
 
             # Upgrade jupytext
-            echo "Upgrading jupytext for python3..."
-            python3 -m pip install --upgrade --user jupytext
+            echo "# Upgrading jupytext for python3..."
+            echo "python3 -m pip install --upgrade --user jupytext"
+            if [[ $not_dry_run ]]; then
+                python3 -m pip install --upgrade --user jupytext
+            fi
             exit 0
             ;;
         -h)
             usage
-            exit 1
+            exit 0
             ;;
     esac
 fi
@@ -76,5 +98,9 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
     usage
 else
     # Okay.  Actually source the environment
+    >&2 echo "Deprecation: Please do not source mmf_setup in future.
+    >&2 echo "Replace \'. mmf_setup $*\' with the following in your .bash_aliases file:"
+    >&2 echo
+    >&2 echo "    eval \"\$(mmf_setup -v $*)\"" 
     eval "$(mmf_setup_bash.py $*)"
 fi

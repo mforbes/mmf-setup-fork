@@ -8,8 +8,8 @@ case $- in
 esac
 
 # This content inserted by mmf_setup
-# Add my mercurial commands like hg ccom for removing output from .ipynb files
-. mmf_setup
+# Add my mercurial configurations.
+eval "$(mmf_setup -v -H)"
 
 # Git config
 export GIT_AUTHOR_NAME="${LC_GIT_USERNAME}"
