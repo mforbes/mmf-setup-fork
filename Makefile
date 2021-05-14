@@ -8,7 +8,7 @@ PYTHON=$(shell hg debuginstall -T'{pythonexe}')
 HG=$(shell which hg)
 #MMF_SETUP=$(shell pwd)/src/mmf_setup
 #MMF_SETUP=$(shell python -c "import os.path, mmf_setup;print(os.path.dirname(mmf_setup.__file__))")
-
+TESTFLAGS=--shell bash
 nbinit.py: make_nbinit.py src/mmf_setup/_data/nbthemes/mmf.*
 	python make_nbinit.py
 
