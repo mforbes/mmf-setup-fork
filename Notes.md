@@ -1,5 +1,3 @@
-% Developer Notes
-
 Developer Notes
 ===============
 
@@ -90,7 +88,7 @@ numbers as appropriate)*
    nox
    ```
 
-   (INCOMPLETE) Demonstrate how to run tests while developing with.
+   (INCOMPLETE) Demonstrate how to run tests while developing with an environment.
 
    (INCOMPLETE) Also check the documentation.  *The `docs` directory contains some old
    documentation and we have code in `.makefiles` to convert this to HTML.  This needs
@@ -237,7 +235,7 @@ environment, then simply run `nox`.  This does one of the following (see
   **BROKEN**: Currently this is broken.  Not sure why, but this gets `mmf_setup cocalc`
   to try to build Mercurial and it cannot in the virtualenv.  Maybe related to the fact
   that the cocalc script tries to install things with `--user` which is disallowed in
-  virtualenvs.  Need to check.
+  virtualenvs.
   
 * If you don't, but have [Conda] installed, then you can have [Nox] install the required
 interpreters with conda by running:
