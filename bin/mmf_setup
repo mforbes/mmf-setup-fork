@@ -7,74 +7,105 @@
 #      https://alum.mit.edu/www/mforbes/public/notes/cocalc-workflow/
 
 function usage() {
-    echo "usage: mmf_setup cocalc [options] OR mmf_setup -v [options] OR source mmf_setup [options]"
+    echo "usage: mmf_setup cocalc [options] OR mmf_setup -v [options]"
     echo
     echo "The first invocation will setup cocalc.com projects:"
     echo
-    echo "   mmf_setup cocalc [options]"
+    echo "   mmf_setup cocalc [-v]"
     echo
-    echo "Additional options are passed to mmf_initial_setup.  For more info run"
-    echo
-    echo "   mmf_initial_setup -h"
-    echo
-    echo "The second invocation will show which environmental variables will be set:"
+    echo "The second invocation will show which environmental variables will be set,"
+    echo "and can be evaluated to set these in your shell:"
     echo
     echo "   mmf_setup -v [options]"
     echo
-    echo "The third invocation will actually set this in your shell by running mmf_setup_bash.py:"
-    echo
-    echo "   source mmf_setup [options]   OR . mmf_setup [options]"
-    echo
     echo "Valid options for mmf_setup_bash.py are:"
-    echo "$(mmf_setup_bash.py -h)"    
+    echo "$(mmf_setup_bash.py -h)"
+    echo
+    echo "You can set these in your shell by running mmf_setup_bash.py:"
+    echo
+    echo "   eval \"\$(mmf_setup -v [options])\""
 }
 
 BIN_DIR="$(dirname $BASH_SOURCE{0})"
 
-if [[ -n $1 ]]; then
-    case $1 in
-        -v)
-            shift # move to the next argument
-            echo "# mmf_setup environment:"
-            echo "$(mmf_setup_bash.py $*)"
-            exit 0
-            ;;
-        smc|cocalc)
-            hg="$(type -p hg)"
-            if [[ -n "${hg}" ]]; then
-		            hg_python="$(hg debuginstall -T'{pythonexe}')"
-                echo "Upgrading mercurial, hg-evolve, and hg-git for hg=${hg}..."
-                echo "${hg_python} -m pip install --upgrade --user mercurial hg-evolve hg-git"
-                ${hg_python} -m pip install --upgrade --user mercurial hg-evolve hg-git
-            else
-                echo "Installing mercurial, hg-evolve, and hg-git for python3..."
-                python3 -m pip install --upgrade --user mercurial hg-evolve hg-git
-            fi
-            
-            DATA_DIR="$(python -c 'import mmf_setup;print(mmf_setup.DATA)')"
-            echo "Setting up config files for CoCalc..."
-            shift # move to the next argument
-            "$BIN_DIR/mmf_initial_setup" \
-                 -v "$DATA_DIR/config_files/cocalc" $*
-            cat "$DATA_DIR/config_files/cocalc/message.txt"
-
-            # Upgrade jupytext
-            echo "Upgrading jupytext for python3..."
-            python3 -m pip install --upgrade --user jupytext
-            exit 0
-            ;;
-        -h)
-            usage
-            exit 1
-            ;;
-    esac
-fi
 if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]]; then
-    # Ensure that this script is sourced, not executed
-    >&2 echo "Error: mmf_setup must be sourced. Run 'source mmf_setup' or '. mmf_setup' instead of 'mmf_setup'"
-    >&2 echo
-    usage
+    if [[ -n $1 ]]; then
+        case $1 in
+            -v)
+                shift # move to the next argument
+                echo "# mmf_setup environment:"
+                echo "$(mmf_setup_bash.py $*)"
+                exit 0
+                ;;
+            smc|cocalc)
+                shift # move to the next argument
+                if [[ $1 == -v ]]; then
+                    shift # move to the next argument
+                    echo "DRY RUN: the following is what would happen with the -v option"
+                    echo
+                    not_dry_run=
+                else
+                    not_dry_run=true
+                fi
+                
+                if [[ "$*" ]]; then
+                    echo "Unknown arguments 'mmf_setup cocalc $*':"
+                    echo
+                    usage
+                    exit 1
+                fi
+                   
+                hg="$(type -p hg)"
+                echo "# Installing mercurial, hg-evolve, hg-git, jupytext for python3..."
+                echo "python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext"
+                if [[ $not_dry_run ]]; then
+                    python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
+                fi
+
+                DATA_DIR="$(python -c 'import mmf_setup;print(mmf_setup.DATA)')"
+                echo "# Setting up config files for CoCalc..."
+                if [[ $not_dry_run ]]; then
+                    if [[ ! -L ~/.bashrc && -f ~/.bashrc ]]; then
+                       echo "mv ~/.bashrc ~/.bashrc_cocalc"
+                       mv ~/.bashrc ~/.bashrc_cocalc
+                    fi
+                    echo "$BIN_DIR/mmf_initial_setup" -v "$DATA_DIR/config_files/cocalc" $*
+                    "$BIN_DIR/mmf_initial_setup" -v "$DATA_DIR/config_files/cocalc" $*
+                else
+                    if [[ ! -L ~/.bashrc && -f ~/.bashrc ]]; then
+                       echo "mv ~/.bashrc ~/.bashrc_cocalc"
+                    fi
+                    "$BIN_DIR/mmf_initial_setup" --no-action -v "$DATA_DIR/config_files/cocalc" $*
+                fi
+                cat "$DATA_DIR/config_files/cocalc/message.txt"
+
+                exit 0
+                ;;
+            *)
+                usage
+                exit 0
+                ;;
+        esac
+    else
+        usage
+        exit 1
+    fi
 else
-    # Okay.  Actually source the environment
-    eval "$(mmf_setup_bash.py $*)"
+    # Actually source the environment
+    >&2 echo "WARNING: mmf_setup Deprecation - Please do not source mmf_setup in future."
+    if [[ "$1" == -v ]]; then
+        usage
+    else
+        >&2 echo "Replace '. mmf_setup $*' with the following in your .bash_aliases file:"
+        >&2 echo
+        >&2 echo "    eval \"\$(mmf_setup -v $*)\""
+        >&2 echo
+        res="$(mmf_setup_bash.py $*)"
+        errorCode=$?
+        if [[ $errorCode == 0 ]]; then
+            eval "$res"
+        else
+            echo "ERROR: Something went wrong with the command '. mmf_setup $*'"
+        fi
+    fi
 fi

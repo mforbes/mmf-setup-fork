@@ -1,10 +1,9 @@
-% Developer Notes
-
 Developer Notes
 ===============
 
 [![Documentation Status][rtd_badge]][rtd]
-[![Tests][ci_badge]][ci]
+[![Tests of Release][ci_badge]][ci]
+[![Tests of Fork][ci_fork_badge]][ci_fork]
 [![Language grade: Python][lgtm_mmf-setup_badge]][lgtm_mmf-setup]
 [![Language grade: Python][lgtm_mmf-setup-fork_badge]][lgtm_mmf-setup-fork]
 [![Code style: black][black_img]][black]
@@ -31,9 +30,10 @@ With CI setup, we have the following badges:
 
     [![Documentation Status][rtd_badge]][rtd]
 
-* Testing at with GitHub actions:
+* Testing at with GitHub actions (release and fork):
 
-    [![Tests][ci_badge]][ci]
+    [![Tests of Release][ci_badge]][ci]
+    [![Tests of Fork][ci_fork_badge]][ci_fork]
 
 * Code quality testing at [lgtm](https://lgtm.com):
 
@@ -55,48 +55,203 @@ Releases
 To prepare for release, make sure you are running in a development environment with the
 Mercurial evolve and topics extensions enabled, and with [Black] and [Nox].
 
-1. Start a development branch and topic:
+### Release Procedure
+
+*(Here is a sample release procedure going from `0.4.0` to `0.4.1`.  Modify the version
+numbers as appropriate)*
+
+1. **Preparation:** Make sure you do your work on the development branch with the name
+   `0.4` (major.minor) with version number `'0.4.x.dev0'` in `setup.py` or
+   `pyproject.toml`.  All work should be with with topics, then merged into the branch.
+
+   Typically this is setup is ensured at the end of the release procedure, but if
+   needed you can do the following:
 
    ```bash
-   hg branch 0.4
-   hg topic 0.4.0
+   hg up 0.4         # Run hg branch 0.4 if needed, but this should exist.
+   hg topic 0.4.1
+   # Check that setup.py has version='0.4.1.dev0'
    ```
 
-2. Change the version number in `setup.py` to `0.4.0.dev0` and commit this:
+2. **Development:** Complete your changes making sure code is well tested etc. While
+   working on specific features, you should always use topics.  When you push to
+   Heptapod, the commits in these topics will remain in the draft phase, allowing you
+   to rebase, etc. as needed to clean the history. We have setup automatic pushes to
+   GitHub and you can see the status of the tests with the badges: [![Tests of
+   Release][ci_badge]][ci][![Tests of Fork][ci_fork_badge]][ci_fork].  The first tests
+   the releases while the second tests development work.  The second one should update
+   when you push topics.
 
-   ```bash
-   hg com -m "BRN: Start working on branch 0.4"
-   hg push --new-branch -r .
-   ```
+   To run the complete set of tests locally, you should be able to just run:
 
-3. Complete your changes making sure code is well tested etc. While working on specific
-   features, you should always use topics.
-   
-   When you push to Heptapod, the commits in these topics will remain in the draft
-   phase, allowing you to rebase, etc. as needed to clean the history. We have setup
-   automatic pushes to GitHub and you can see the status of the tests with the badge:
-   [![Tests][ci_badge]][ci].
-
-   To run the tests locally, you should be able to just run:
-   
    ```bash
    nox
    ```
-4. Once everything is working and tested, push it to Heptapod and create Merge Requests
-   as needed.  First merge all open topics to the development branch, then change the
-   revision in `setup.py` to `'0.4.0'`, dropping the `'.dev'`.  Push this to Heptapod
-   and create a merge request to merge this to the default branch. 
-   
-   Review the changes and fix as needed.
 
-*Unlike previously, do not close the branch. Just leave it.*
-   
+   (INCOMPLETE) Demonstrate how to run tests while developing with an environment.
 
+   (INCOMPLETE) Also check the documentation.  *The `docs` directory contains some old
+   documentation and we have code in `.makefiles` to convert this to HTML.  This needs
+   updating and cleanup.  The official package documentation is in the `README.md` file
+   which we discuss below.*
+
+3. **Release:** Once everything is working and tested, push it to Heptapod and create
+   Merge Requests as needed.  First merge all open topics to the development branch,
+   then:
+
+   1. Change the revision in `setup.py` or `pyproject.toml` to `version='0.4.2'`,
+      dropping the `'.dev0'`.  Push this to Heptapod and create a merge request to
+      merge this to the default branch.   Review the changes and fix as needed.
+   2. Add notes about the changes in `CHANGES.md`.  *(These should be apparent from the review.)*
+   3. Check that the documentation looks okay:
+
+      ```bash
+      make README_CHANGES.html
+      open README_CHANGES.html
+      make clean
+      ```
+   4. Try uploading your package to `pypi` with `twine`:
+
+      ```bash
+      python setup.py sdist bdist_wheel
+      twine check dist/mmf_setup-*
+      twine upload dist/mmf_setup-*
+      ```
+
+      *(Eventually this will be done with [Poetry]).*
+   5. If this works, then complete the Merge Request into the default branch with a commit
+      message starting: `"REL: 0.4.1"`.  *Unlike previously, do not close the
+      branch. Just leave it open so it can be found.*
+   6. Pull in these changes, update, and tag the commit.  Then return to the
+      development branch for future work.
+
+      ```bash
+      $ hg pull
+      $ hg up default
+      $ hg lg
+        o  214:p m (22 hours ago)  0.4.1
+       /|   REL: 0.4.1
+      o |  213:p michael (23 hours ago) 0.4
+      | |   TST: Working tests.  Ready for release.
+      o |  212:p michael (4 days ago) 0.4
+      | |   Add comment to mmf_setup -v output so it can be evaled.
+      ...
+      $ hg tag 0.4.1
+      $ hg up 0.4
+      $ hg lg -v
+        0  217:1c56fef2ea9c:d michael (9 hours ago)
+        |   Added tag 0.4.1 for changeset 69c00f4e2154
+        o  214:69c00f4e2154:p m (22 hours ago)  0.4.1
+       /|   REL: 0.4.1
+      @ |  213:453e5d5838d2:p michael (23 hours ago) 0.4
+      | |   TST: Working tests.  Ready for release.
+      o |  212:9036a9114731:p michael (4 days ago) 0.4
+      | |   Add comment to mmf_setup -v output so it can be evaled.
+      ...
+      ```
+4. **Preparation:***  Start work on next release by tagging and/or creating a new branch
+   if needed.
    
-Start work on next branch:
+   ```bash
+   # Edit setup.py or pyproject.toml to set `version='0.4.2.dev0'`
+   $ hg topic 0.4.2
+   $ hg com -m "VER: 0.4.2 start"
+   $ hg lg
+   @  219:d michael (9 hours ago) 0.4[0.4.2] tip
+   |   VER: 0.4.2 start
+   | o  217:d michael (9 hours ago)
+   | |   Added tag 0.4.1 for changeset 69c00f4e2154
+   | o  214:p m (22 hours ago)  0.4.1
+   |/|   REL: 0.4.1
+   o |  213:p michael (23 hours ago) 0.4
+   | |   TST: Working tests.  Ready for release.
+   o |  212:p michael (4 days ago) 0.4
+   | |   Add comment to mmf_setup -v output so it can be evaled.
+   ...
+   ```
    
+   or, if starting branch 0.5:
+
+   ```bash
+   # Edit setup.py or pyproject.toml to set `version='0.5.0.dev0'`
+   $ hg branch 0.5
+   $ hg com -m "BRN: 0.5"
+   $ hg topic 0.5.0
+   $ hg com -m "VER: 0.5.0 start"
+   $ hg lg
+   @  219:d michael (9 hours ago) 0.5[0.5.0] tip
+   |   VER: 0.5.0 start
+   | o  217:d michael (9 hours ago)
+   | |   Added tag 0.4.1 for changeset 69c00f4e2154
+   | o  214:p m (22 hours ago)  0.4.1
+   |/|   REL: 0.4.1
+   o |  213:p michael (23 hours ago) 0.4
+   | |   TST: Working tests.  Ready for release.
+   o |  212:p michael (4 days ago) 0.4
+   | |   Add comment to mmf_setup -v output so it can be evaled.
+   ...
+   ```
+
+Testing
+=======
+
+We have two types of tests here:
+
+1. Standard python tests run with [pytest].  These are organized in the `tests/` folder
+   and can simply be run with `pytest`.
+2. Tests of shell and mercurial functionality run with their [`run-tests.py`] script.
+   These need a bit of care when being run because they execute commands.  They should
+   be run using the `Makefile` which specifies some environmental flags.  Some things to
+   be careful of when modifying these:
    
-**PyPi**
+   * When testing `mmf_setup cocalc`, we must make sure that we do not touch the user's
+     `~/.local` directory.  This requires carefully setting `PYTHONUSERBASE`.  A way to
+     check this is to lock `~/.local` before running the tests:
+     
+     ```bash
+     mv ~/.local ~/.local_
+     mkdir ~/.local
+     chmod a-rwx ~/.local
+     make test
+     rmdir ~/.local
+     mv ~/.local_ ~/.local
+     ```
+     
+     We don't do this in the tests because this could be very confusing for a user, but
+     occasionally check that this does not break the tests.
+ 
+The tests should be run with [Nox], which will test in an isolated environment against
+various versions of python.  Simply make sure that [Nox] is installed in your work
+environment, then simply run `nox`.  This does one of the following (see
+`nox.options.sessions` in [`noxfile.py`](noxfile.py)):
+
+* If you have `python3.6`, `python3.7`, etc. available on your system in your `PATH`,
+  then you can run the regular tests:
+
+  ```bash
+  nox -s test
+  ```
+  
+  **BROKEN**: Currently this is broken.  Not sure why, but this gets `mmf_setup cocalc`
+  to try to build Mercurial and it cannot in the virtualenv.  Maybe related to the fact
+  that the cocalc script tries to install things with `--user` which is disallowed in
+  virtualenvs.
+  
+* If you don't, but have [Conda] installed, then you can have [Nox] install the required
+interpreters with conda by running:
+
+  ```bash
+  nox -s test_conda
+  ```
+  
+We set `PYTHONNOUSERSITE=1` explicitly before running the tests to ensure that
+everything is installed in the virtual environments.  Without this, a user-installed
+package (like Mercurial in this case) might be used.
+
+These tests are also run with the GitHub CI as defined in
+[`.github/workflows/tests.yml`](.github/workflows/tests.yml).
+
+(INCOMPLETE)
 
 To release a new version be sure to do the following. (The examples use
 revision numbers etc. for release 0.1.11.)
@@ -104,8 +259,8 @@ revision numbers etc. for release 0.1.11.)
 1.  Make sure your code works and that the tests pass. Pull any open
     issues into the main release branch, closing those issue branches.
 
-    To run the tests, make sure you have [nox](https://nox.thea.codes)
-    and [Conda](http://docs.continuum.io/conda) installed in some
+    To run the tests, make sure you have [make], [Nox]
+    and [Conda] installed in some
     environment, then run:
 
         nox
@@ -142,50 +297,13 @@ revision numbers etc. for release 0.1.11.)
         cd /data/apps/conda/conda-bld/debug_.../work && source build_env_setup.sh
         pip install -e .[test]
 
-2.  Commit all your changes. (This is an optional commit, if the changes
-    are small, this can be rolled in with the following commit.)
-3.  Remove the `'dev'` from the version, i.e. `'0.1.11dev' -> '0.1.11'`,
-    in the following files:
-
-        setup.py
-        meta.yaml
-
-4.  Add a note about the changes in `CHANGES.txt`.
-5.  Check that the documentation looks okay:
-
-        make README_CHANGES.html
-        open README_CHANGES.html
-        make clean
-
-6.  Commit the changes. Start the commit message with:
-
-        hg com -m "REL: 0.1.11 ..."
-
-7.  Create a pull request (PR) on bitbucket to pull this branch to
-    `default` and make sure to specify to close the branch on pull.
-8.  Check, approve, and merge the PR.
-9.  Upload your package to `pypi` with `twine`:
-
-        python setup.py sdist bdist_wheel
-        twine check dist/mmf_setup-*
-        twine upload dist/mmf_setup-*
-
-10. Pull the merge from bitbucket to your development machine but **do
-    not update**.
-11. Update the version in `setup.py` and `meta.yaml` to `'0.1.12dev'` or
-    whatever is relevant.
-12. From the previous commit (the last commit on branch `0.1.11` in this
-    case), change the branch:
-
-        hg branch 0.1.12
-
-13. Commit and optionally push. Now you are ready to work on new
-    changes:
-
-        hg com -m "BRN: Start branch 0.1.12"
-        hg push -r . --new-branch
-
 **Anaconda**
+
+(INCOMPLETE) I am not sure if we want to keep supporting releases with Anaconda.  Might
+be simpler just to use pip and eventually integrate with conda-forge.
+
+(INCOMPLETE) I am not sure if we want to keep supporting releases with Anaconda.  Might
+be simpler just to use pip and eventually integrate with conda-forge.
 
 The information about building the package for conda is specified in the
 `meta.yaml` file.
@@ -246,8 +364,11 @@ The information about building the package for conda is specified in the
 
 [drone_badge]: <https://cloud.drone.io/api/badges/forbes-group/mmf-setup/status.svg>
 [drone]: https://cloud.drone.io/forbes-group/mmf-setup
-[ci_badge]: <https://github.com/mforbes/mmf-setup-fork/actions/workflows/tests.yml/badge.svg>
-[ci]: <https://github.com/mforbes/mmf-setup-fork/actions/workflows/tests.yml>
+[ci_badge]: <https://github.com/forbes-group/mmf-setup/actions/workflows/tests.yml/badge.svg>
+[ci]: <https://github.com/forbes-group/mmf-setup/actions/workflows/tests.yml>
+
+[ci_fork_badge]: <https://github.com/mforbes/mmf-setup-fork/actions/workflows/tests.yml/badge.svg>
+[ci_fork]: <https://github.com/mforbes/mmf-setup-fork/actions/workflows/tests.yml>
 
 [black]: https://github.com/psf/black
 [black_img]: https://img.shields.io/badge/code%20style-black-000000.svg
@@ -267,3 +388,6 @@ The information about building the package for conda is specified in the
 [Conda]: <https://docs.conda.io> "Conda"
 [Heptapod]: <https://heptapod.net> "Heptapod website"
 [pytest]: <https://docs.pytest.org> "pytest"
+[Poetry]: <https://python-poetry.org> "Poetry": Python packaging and dependency management made easy."
+[`run-tests.py`]: <https://www.mercurial-scm.org/wiki/WritingTests> "Mercurial test suite.
+[make]: <https://www.gnu.org/software/make/> "GNU Make"

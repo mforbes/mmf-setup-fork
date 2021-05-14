@@ -1,6 +1,37 @@
 Changes
 =======
 
+## 0.4.2
+
+- Resolves issue #26: Significant improvements for installation on CoCalc.
+  - Moves `~/.bashrc` to `~/.bashrc_cocalc` so we can insert `~/.local/bin` to the
+    `PATH` for non-login shells.  This is important when trying to push with `hg` over
+    SSH, which runs `hg` without logging in.  Our new workflow needs that `hg` to have
+    access to `evolve` etc.   Previously this worked by updating these with the system
+    `Python 2` version of `hg`, but that now fails with new projects, so we have removed
+    this.
+  - Add `.hgrc` tweaks to top-level cocalc `~.hgrc` (might as well include `hgrc.lga`
+    here now so students etc. can see these.  Don't enable `evolve` etc. by default
+    though.)
+  - Users should now call `eval "$(mmf_setup -v -H)"` rather than using source
+    `. mmf_setup -H`.  Sourcing `mmf_setup` now emits a deprecation warning message.
+  - Cocalc install is now tested in an isolated manner.  (Only the `nox -s test_cocalc`
+    works... see issue #27.)
+- Make `hgrc.full` POSIX compliant (work with `sh`).  (Was causing GitHub workflow to
+  fail.)  Scripts still require `bash` which is explicitly chosen when we call
+  `run-tests.py`.
+- Working GitHub workflows and cocalc tests.
+- Updated release process.
+
+
+## 0.4.1
+
+- Make `mmf_setup -v` output clean so that we can `eval "$(mmf_setup -v)"` rather than
+  sourcing. *In the future we will make this a python file, so `eval` will be the only
+  option.*
+- Fixed issues with `nbinit()` failing with not paths defined.
+- Added more tests.
+
 ## 0.4.0
 
 - Resolves issue #23: Drop support of nbclean mercurial extension (to hard to

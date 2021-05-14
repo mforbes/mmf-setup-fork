@@ -97,18 +97,19 @@ Quickstart (TL;DR)
     ways:
 
     ```bash
-    . mmf_setup     # Will enable hg lg but not evolve, hg-git, etc.
-    . mmf_setup -H  # Enable hg-git, evolve, topics and update hook.
-    mmf_setup -v [-H]  # Shows variables that will be set (dry run).
+    eval $"(mmf_setup -v)"     # Enable hg lg but not evolve, etc.
+    eval $"(mmf_setup -v -H)"  # Enable evolve, etc.
+    mmf_setup -v [-H]          # Shows what will be set set (dry run).
     ```
 
     To do this automatically when you login, add this line to your `~/.bashc` or
     `~/.bash_profile` scripts.
     
-    > **Warning:** the `. mmf_setup -H` option also includes a mercurial update hook
-    > which will add `%include ../.hgrc` to your projects `.hg/hgrc` file upon `hg
-    > update`.  This allows you to include project-specific mercurial customizations in
-    > your repository, but is a potential security risk.  See the discussion below.
+    > **Warning:** the `eval $"(mmf_setup -v -H)"` option also includes a mercurial
+    > update hook which will add `%include ../.hgrc` to your projects `.hg/hgrc` file
+    > upon `hg > update`.  This allows you to include project-specific mercurial
+    > customizations in your repository, but is a potential security risk.  See the
+    > discussion below.
 
     These can also be enabled manually by adding the following to your `~/.hgrc` file:
 
@@ -166,8 +167,8 @@ Mercurial (hg) Tools
 If you source the output of the `mmf_setup` script with one of the following:
 
 ```bash
-. mmf_setup
-. mmf_setup -H
+eval $"(mmf_setup -v)"
+eval $"(mmf_setup -v -H)"
 ```
 
 then your `HGRCPATH` will be amended to include
@@ -196,7 +197,7 @@ risk, because an untrusted repo could include dangerous commands in `.hgrc`.  Th
 require user intervention before including this:
 
 ```bash
-$ . mmf_setup -H
+$ eval $"(mmf_setup -v -H)"
 $ hg clone https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf-setup
 ...
 updating to branch default
