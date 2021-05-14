@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python3
 from optparse import OptionParser
 from os.path import exists
 

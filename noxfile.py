@@ -17,7 +17,7 @@ nox.options.sessions = ["test_conda"]
 @nox.session(python=["3.6", "3.7", "3.8", "3.9"])
 def test(session):
     session.install(".[test]")
-    session.run("make", "test", external=True)
+    session.run("make", "test-cocalc", external=True)
 
 
 @nox.session(venv_backend="conda", python=["3.6", "3.7", "3.8", "3.9"])

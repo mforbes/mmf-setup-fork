@@ -196,6 +196,63 @@ numbers as appropriate)*
 
 Testing
 =======
+
+We have two types of tests here:
+
+1. Standard python tests run with [pytest].  These are organized in the `tests/` folder
+   and can simply be run with `pytest`.
+2. Tests of shell and mercurial functionality run with their [`run-tests.py`] script.
+   These need a bit of care when being run because they execute commands.  They should
+   be run using the `Makefile` which specifies some environmental flags.  Some things to
+   be careful of when modifying these:
+   
+   * When testing `mmf_setup cocalc`, we must make sure that we do not touch the user's
+     `~/.local` directory.  This requires carefully setting `PYTHONUSERBASE`.  A way to
+     check this is to lock `~/.local` before running the tests:
+     
+     ```bash
+     mv ~/.local ~/.local_
+     mkdir ~/.local
+     chmod a-rwx ~/.local
+     make test
+     rmdir ~/.local
+     mv ~/.local_ ~/.local
+     ```
+     
+     We don't do this in the tests because this could be very confusing for a user, but
+     occasionally check that this does not break the tests.
+ 
+The tests should be run with [Nox], which will test in an isolated environment against
+various versions of python.  Simply make sure that [Nox] is installed in your work
+environment, then simply run `nox`.  This does one of the following (see
+`nox.options.sessions` in [`noxfile.py`](noxfile.py)):
+
+* If you have `python3.6`, `python3.7`, etc. available on your system in your `PATH`,
+  then you can run the regular tests:
+
+  ```bash
+  nox -s test
+  ```
+  
+  **BROKEN**: Currently this is broken.  Not sure why, but this gets `mmf_setup cocalc`
+  to try to build Mercurial and it cannot in the virtualenv.  Maybe related to the fact
+  that the cocalc script tries to install things with `--user` which is disallowed in
+  virtualenvs.  Need to check.
+  
+* If you don't, but have [Conda] installed, then you can have [Nox] install the required
+interpreters with conda by running:
+
+  ```bash
+  nox -s test_conda
+  ```
+  
+We set `PYTHONNOUSERSITE=1` explicitly before running the tests to ensure that
+everything is installed in the virtual environments.  Without this, a user-installed
+package (like Mercurial in this case) might be used.
+
+These tests are also run with the GitHub CI as defined in
+[`.github/workflows/tests.yml`](.github/workflows/tests.yml).
+
 (INCOMPLETE)
 
 To release a new version be sure to do the following. (The examples use
@@ -204,8 +261,8 @@ revision numbers etc. for release 0.1.11.)
 1.  Make sure your code works and that the tests pass. Pull any open
     issues into the main release branch, closing those issue branches.
 
-    To run the tests, make sure you have [nox](https://nox.thea.codes)
-    and [Conda](http://docs.continuum.io/conda) installed in some
+    To run the tests, make sure you have [make], [Nox]
+    and [Conda] installed in some
     environment, then run:
 
         nox
@@ -334,3 +391,5 @@ The information about building the package for conda is specified in the
 [Heptapod]: <https://heptapod.net> "Heptapod website"
 [pytest]: <https://docs.pytest.org> "pytest"
 [Poetry]: <https://python-poetry.org> "Poetry": Python packaging and dependency management made easy."
+[`run-tests.py`]: <https://www.mercurial-scm.org/wiki/WritingTests> "Mercurial test suite.
+[make]: <https://www.gnu.org/software/make/> "GNU Make"

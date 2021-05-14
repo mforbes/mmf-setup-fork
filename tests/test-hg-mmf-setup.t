@@ -1,23 +1,16 @@
 The help message:
 
   $ mmf_setup -h
-  usage: mmf_setup cocalc [options] OR mmf_setup -v [options] OR source mmf_setup [options]
+  usage: mmf_setup cocalc [options] OR mmf_setup -v [options]
   
   The first invocation will setup cocalc.com projects:
   
-     mmf_setup cocalc [options]
+     mmf_setup cocalc [-v]
   
-  Additional options are passed to mmf_initial_setup.  For more info run
-  
-     mmf_initial_setup -h
-  
-  The second invocation will show which environmental variables will be set:
+  The second invocation will show which environmental variables will be set,
+  and can be evaluated to set these in your shell:
   
      mmf_setup -v [options]
-  
-  The third invocation will actually set this in your shell by running mmf_setup_bash.py:
-  
-     source mmf_setup [options]   OR . mmf_setup [options]
   
   Valid options for mmf_setup_bash.py are:
   Usage: mmf_setup_bash.py [options]
@@ -31,30 +24,24 @@ The help message:
                  hook to include project-specific .hgrc file to .hg/hgrc. (Note:
                  this is a POTENTIAL SECURITY RISK.  Make sure you inspect the
                  .hgrc file before running further mercurial commands.)
-  [1]
+  
+  You can set these in your shell by running mmf_setup_bash.py:
+  
+     eval "$(mmf_setup -v [options])"
 
 Try calling it without sourcing:
 
   $ mmf_setup -H
-  Error: mmf_setup must be sourced. Run 'source mmf_setup' or '. mmf_setup' instead of 'mmf_setup'
-  
-  usage: mmf_setup cocalc [options] OR mmf_setup -v [options] OR source mmf_setup [options]
+  usage: mmf_setup cocalc [options] OR mmf_setup -v [options]
   
   The first invocation will setup cocalc.com projects:
   
-     mmf_setup cocalc [options]
+     mmf_setup cocalc [-v]
   
-  Additional options are passed to mmf_initial_setup.  For more info run
-  
-     mmf_initial_setup -h
-  
-  The second invocation will show which environmental variables will be set:
+  The second invocation will show which environmental variables will be set,
+  and can be evaluated to set these in your shell:
   
      mmf_setup -v [options]
-  
-  The third invocation will actually set this in your shell by running mmf_setup_bash.py:
-  
-     source mmf_setup [options]   OR . mmf_setup [options]
   
   Valid options for mmf_setup_bash.py are:
   Usage: mmf_setup_bash.py [options]
@@ -68,3 +55,16 @@ Try calling it without sourcing:
                  hook to include project-specific .hgrc file to .hg/hgrc. (Note:
                  this is a POTENTIAL SECURITY RISK.  Make sure you inspect the
                  .hgrc file before running further mercurial commands.)
+  
+  You can set these in your shell by running mmf_setup_bash.py:
+  
+     eval "$(mmf_setup -v [options])"
+
+Now try sourcing.  This should raise the deprecation warning
+
+  $ . mmf_setup
+  WARNING: mmf_setup Deprecation - Please do not source mmf_setup in future.
+  Replace '. mmf_setup ' with the following in your .bash_aliases file:
+  
+      eval "$(mmf_setup -v )"
+  

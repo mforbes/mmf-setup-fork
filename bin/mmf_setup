@@ -56,20 +56,11 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
                 fi
                    
                 hg="$(type -p hg)"
-                # if [[ -n "${hg}" ]]; then
-                #     hg_python="$(hg debuginstall -T'{pythonexe}')"
-                #     echo "# Upgrading mercurial, hg-evolve, and hg-git for hg=${hg}..."
-                #     echo "${hg_python} -m pip install --upgrade --user mercurial hg-evolve hg-git"
-                #     if [[ $not_dry_run ]]; then
-                #         ${hg_python} -m pip install --upgrade --user mercurial hg-evolve hg-git
-                #     fi
-                # else
-                    echo "# Installing mercurial, hg-evolve, and hg-git for python3..."
-                    echo "python3 -m pip install --upgrade --user mercurial hg-evolve hg-git jupytext"
-                    if [[ $not_dry_run ]]; then
-                        python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
-                    fi
-                #fi
+                echo "# Installing mercurial, hg-evolve, hg-git, jupytext for python3..."
+                echo "python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext"
+                if [[ $not_dry_run ]]; then
+                    python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
+                fi
 
                 DATA_DIR="$(python -c 'import mmf_setup;print(mmf_setup.DATA)')"
                 echo "# Setting up config files for CoCalc..."
@@ -90,11 +81,14 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
 
                 exit 0
                 ;;
-            -h)
+            *)
                 usage
                 exit 0
                 ;;
         esac
+    else
+        usage
+        exit 1
     fi
 else
     # Actually source the environment
