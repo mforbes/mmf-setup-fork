@@ -19,43 +19,60 @@ import subprocess
 
 # Parse arguments
 usage = "Usage: %prog [options] dir1 dir2 ..."
-parser = OptionParser(usage=usage,
-                      description=__doc__.splitlines()[0],
-                      epilog='\n'.join(__doc__.splitlines()[2:]))
-parser.add_option("--home",
-                  type="string",
-                  dest="home_dir",
-                  default="~",
-                  help=("use <home> rather than ~ for installation." +
-                        "(Used to replace '~' in dest strings.)"),
-                  metavar="<home>")
-parser.add_option("-v", "--verbose",
-                  action="store_true",
-                  dest="verbose",
-                  default=False,
-                  help="print lots of information")
-parser.add_option("-n", "--no-action",
-                  action="store_false",
-                  dest="action",
-                  default=True,
-                  help=("don't do anything:" +
-                        "only print commands that would be executed"))
-parser.add_option("-i", "--interactive",
-                  action="store_true",
-                  dest="interactive",
-                  default=False,
-                  help="prompt before taking action")
-parser.add_option("-a", "--abs-path",
-                  action="store_true",
-                  dest="abspath",
-                  default=False,
-                  help="Use absolute symlinks (defaults are relative to ~)")
-                  
+parser = OptionParser(
+    usage=usage,
+    description=__doc__.splitlines()[0],
+    epilog="\n".join(__doc__.splitlines()[2:]),
+)
+parser.add_option(
+    "--home",
+    type="string",
+    dest="home_dir",
+    default="~",
+    help=(
+        "use <home> rather than ~ for installation."
+        + "(Used to replace '~' in dest strings.)"
+    ),
+    metavar="<home>",
+)
+parser.add_option(
+    "-v",
+    "--verbose",
+    action="store_true",
+    dest="verbose",
+    default=False,
+    help="print lots of information",
+)
+parser.add_option(
+    "-n",
+    "--no-action",
+    action="store_false",
+    dest="action",
+    default=True,
+    help=("don't do anything:" + "only print commands that would be executed"),
+)
+parser.add_option(
+    "-i",
+    "--interactive",
+    action="store_true",
+    dest="interactive",
+    default=False,
+    help="prompt before taking action",
+)
+parser.add_option(
+    "-a",
+    "--abs-path",
+    action="store_true",
+    dest="abspath",
+    default=False,
+    help="Use absolute symlinks (defaults are relative to ~)",
+)
+
 (options, args) = parser.parse_args()
 
 # These are directories that should be ignored -- mainly includes
 # version control information.
-_IGNORE_DIRS = ['CVS', '.svn', '.hg']
+_IGNORE_DIRS = ["CVS", ".svn", ".hg"]
 
 
 ##################
@@ -64,10 +81,11 @@ def yes_no(default=""):
     """This function prompts the user for a yes or no answer and will
     accept a default response.  Exceptions (such as EOF) are not
     caught.  The result is True for 'yes' and False for 'no'."""
+
     def validate(ans):
         ans = ans.lower()
-        yes = ['y', 'yes']
-        no = ['n', 'no']
+        yes = ["y", "yes"]
+        no = ["n", "no"]
         try:
             yes.index(ans)
             return True
@@ -85,12 +103,10 @@ def yes_no(default=""):
         if 0 == len(response):
             response = default
         return response
-        
-    prompts = {None: "yes/no? ",
-               True: "Yes/no? ",
-               False: "yes/No? "}
+
+    prompts = {None: "yes/no? ", True: "Yes/no? ", False: "yes/No? "}
     prompt = prompts[validate(default)]
-    
+
     ans = validate(raw_input_default(prompt, default))
     while ans is None:
         print('Please answer "yes" or "no".')
@@ -104,15 +120,17 @@ class AttributeError(Exception):
 
 def check_access(path, mode):
     """Check that path has proper access as specified by mode.
-    
+
     Throws an AttributeError on failure
     """
     if not os.access(path, mode):
         err = "Path " + path + " has invalid permissions:"
-        tests = [(os.F_OK, "exist"),
-                 (os.R_OK, "be readable"),
-                 (os.W_OK, "be writable"),
-                 (os.X_OK, "be executable")]
+        tests = [
+            (os.F_OK, "exist"),
+            (os.R_OK, "be readable"),
+            (os.W_OK, "be writable"),
+            (os.X_OK, "be executable"),
+        ]
         for (test_mode, msg) in tests:
             if (mode & test_mode) and not os.access(path, test_mode):
                 err = err + "\n- Path must " + msg
@@ -123,14 +141,11 @@ def check_access(path, mode):
 
 def execute(command, cwd=None):
     """This function executes the specified command at the os level."""
-    
+
     try:
-        retcode = subprocess.call(command,
-                                  shell=True,
-                                  cwd=cwd)
+        retcode = subprocess.call(command, shell=True, cwd=cwd)
         if retcode < 0:
-            print("Child was terminated by signal {}".format(-retcode),
-                  file=sys.stderr)
+            print("Child was terminated by signal {}".format(-retcode), file=sys.stderr)
         else:
             print("Child returned {}".format(retcode), file=sys.stderr)
     except OSError as e:
@@ -163,12 +178,12 @@ def do(cmds, mesg=None, query=None, options=options):
                 try:
                     exec(c)
                 except Exception as e:
-                    print("Command {} failed: {}".format(c, e),  file=sys.stderr)
+                    print("Command {} failed: {}".format(c, e), file=sys.stderr)
                     success = False
     else:
         for c in cmds:
             print(c)
-    return (success)
+    return success
 
 
 def os_do(action, options=options):
@@ -189,12 +204,12 @@ def backup(file):
     bak = ".".join([file, "bak"])
     n = 0
     while os.path.isfile(bak):
-        n = n+1
+        n = n + 1
         bak = "%s.bak%i" % (file, n)
 
-    cmds=["os.rename('%s', '%s')" % (file, bak)]
+    cmds = ["os.rename('%s', '%s')" % (file, bak)]
     if do(cmds):
-        return(bak)
+        return bak
     else:
         raise Exception("Could not backup %s to %s." % (file, bak))
 
@@ -219,7 +234,7 @@ def main():
 
     for src_dir in args:
         src_dir = os.path.expanduser(src_dir)
-        if '.' == src_dir or '..' in src_dir:
+        if "." == src_dir or ".." in src_dir:
             src_dir = os.path.abspath(src_dir)
         if not os.path.isabs(src_dir):
             src_dir = os.path.abspath(src_dir)
@@ -236,48 +251,50 @@ def main():
             files = filter(is_not_temp, files)
             sys_home = os.path.expanduser("~")
 
-            for f in files:
+            for f in sorted(files):
                 src = os.path.join(root, f)
 
                 # Files are linked when the second line of the file
                 # looks like "# dest=~/.xsession" with optional whitespace
-                with open(src, 'r') as fd:
+                with open(src, "r") as fd:
                     fd.readline()
-                    dest = re.match(r"\A\s*[#;\\]*\s*dest\s*=\s*(\S*)",
-                                    fd.readline())
+                    dest = re.match(r"\A\s*[#;\\]*\s*dest\s*=\s*(\S*)", fd.readline())
 
                 if dest is not None:
                     dest = os.path.expanduser(dest.group(1))
                     if dest.startswith(sys_home):
                         # Replace with new home.
 
-                        dest = os.path.join(home_dir,
-                                            dest[len(sys_home + os.sep):])
+                        dest = os.path.join(home_dir, dest[len(sys_home + os.sep) :])
                 if dest is not None:
                     dest_dir = os.path.dirname(dest)
                     if options.abspath:
                         ln_src = os.path.abspath(src)
                     else:
-                        ln_src = os.path.relpath(os.path.realpath(src),
-                                                 os.path.realpath(dest_dir))
+                        ln_src = os.path.relpath(
+                            os.path.realpath(src), os.path.realpath(dest_dir)
+                        )
 
                     if not os.path.exists(dest_dir):
-                        mesg = "Directory %s does not exist." % (
-                            dest_dir,)
+                        mesg = "Directory %s does not exist." % (dest_dir,)
                         query = "Create %s ?" % (dest_dir,)
                         cmds = ["os.makedirs('%s')" % (dest_dir,)]
                         do(cmds, mesg, query)
                     if os.path.islink(dest):
                         mesg = "Symlink %s exists." % (dest,)
                         query = "Remove and replace with link to %s?" % (ln_src,)
-                        cmds = ["os.remove('%s')" % (dest,),
-                                "os.symlink('%s', '%s')" % (ln_src, dest)]
+                        cmds = [
+                            "os.remove('%s')" % (dest,),
+                            "os.symlink('%s', '%s')" % (ln_src, dest),
+                        ]
                         do(cmds, mesg, query)
                     elif os.path.isfile(dest):
                         mesg = "File %s exists." % (dest,)
                         query = "Backup and symlink '%s' -> '%s'?" % (ln_src, dest)
-                        cmds=["backup('%s')" % (dest,),
-                              "os.symlink('%s', '%s')" % (ln_src, dest)]
+                        cmds = [
+                            "backup('%s')" % (dest,),
+                            "os.symlink('%s', '%s')" % (ln_src, dest),
+                        ]
                         do(cmds, mesg, query)
                     else:
                         query = "Link %s to %s?" % (ln_src, dest)
@@ -285,5 +302,5 @@ def main():
                         do(cmds, query=query)
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

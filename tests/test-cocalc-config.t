@@ -60,18 +60,18 @@ don't muck up the test-runner's ~/.local directory.
   # Setting up config files for CoCalc...
   Using <home> = $TESTTMP
   Using dir = */site-packages/mmf_setup/_data/config_files/cocalc (glob)
-  Directory $TESTTMP/.local/bin does not exist.
-  os.makedirs('$TESTTMP/.local/bin')
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/mr', '$TESTTMP/.local/bin/mr') (glob)
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/pdbrc', '$TESTTMP/.pdbrc') (glob)
   File $TESTTMP/.bash_aliases exists.
   backup('$TESTTMP/.bash_aliases')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases', '$TESTTMP/.bash_aliases') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/mrconfig', '$TESTTMP/.mrconfig') (glob)
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgrc', '$TESTTMP/.hgrc') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/inputrc', '$TESTTMP/.inputrc') (glob)
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
+  Directory $TESTTMP/.local/bin does not exist.
+  os.makedirs('$TESTTMP/.local/bin')
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/mr', '$TESTTMP/.local/bin/mr') (glob)
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/mrconfig', '$TESTTMP/.mrconfig') (glob)
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/pdbrc', '$TESTTMP/.pdbrc') (glob)
   Configurations for your CoCalc project have been symlinked as described above.
   
   If you use version control, then to get the most of the configuration,
@@ -98,34 +98,26 @@ don't muck up the test-runner's ~/.local directory.
         SetEnv LC_EDITOR=vi
 
 We filter the output with grep because the order of these installs is random.
-  $ mmf_setup cocalc | grep -Ev "^Requirement already satisfied"
+  $ mmf_setup cocalc | grep -Ev "^(Requirement|Collecting|  Downloading)"
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
   python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
-  Collecting * (glob)
-    Downloading * (glob)
-  Collecting * (glob)
-    Downloading * (glob)
-  Collecting * (glob)
-    Downloading * (glob)
-  Collecting * (glob)
-    Downloading * (glob)
-  Installing collected packages: markdown-it-py, mdit-py-plugins, pyyaml, jupytext
-  Successfully installed jupytext* markdown-it-py* mdit-py-plugins* pyyaml* (glob)
+  Installing collected packages: * (glob)
+  Successfully installed * (glob)
   # Setting up config files for CoCalc...
   */mmf_initial_setup -v */site-packages/mmf_setup/_data/config_files/cocalc (glob)
   Using <home> = $TESTTMP
   Using dir = */site-packages/mmf_setup/_data/config_files/cocalc (glob)
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/mr', '$TESTTMP/.local/bin/mr') (glob)
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/pdbrc', '$TESTTMP/.pdbrc') (glob)
   File $TESTTMP/.bash_aliases exists.
   backup('$TESTTMP/.bash_aliases')
   os.rename('$TESTTMP/.bash_aliases', '$TESTTMP/.bash_aliases.bak')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases', '$TESTTMP/.bash_aliases') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/mrconfig', '$TESTTMP/.mrconfig') (glob)
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgrc', '$TESTTMP/.hgrc') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/inputrc', '$TESTTMP/.inputrc') (glob)
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/mr', '$TESTTMP/.local/bin/mr') (glob)
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/mrconfig', '$TESTTMP/.mrconfig') (glob)
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/pdbrc', '$TESTTMP/.pdbrc') (glob)
   Configurations for your CoCalc project have been symlinked as described above.
   
   If you use version control, then to get the most of the configuration,
@@ -157,13 +149,14 @@ We filter the output with grep because the order of these installs is random.
   .bash_aliases@
   .bash_aliases.bak
   .bashrc@
+  .cache/ (?)
   .hgignore@
   .hgrc@
   .inputrc@
   .local/
   .mrconfig@
   .pdbrc@
-  * (glob)
+  Library/ (?)
   $ mmf_setup cocalc -v
   DRY RUN: the following is what would happen with the -v option
   
@@ -172,30 +165,30 @@ We filter the output with grep because the order of these installs is random.
   # Setting up config files for CoCalc...
   Using <home> = $TESTTMP
   Using dir = */site-packages/mmf_setup/_data/config_files/cocalc (glob)
-  Symlink $TESTTMP/.local/bin/mr exists.
-  os.remove('$TESTTMP/.local/bin/mr')
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/mr', '$TESTTMP/.local/bin/mr') (glob)
-  Symlink $TESTTMP/.pdbrc exists.
-  os.remove('$TESTTMP/.pdbrc')
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/pdbrc', '$TESTTMP/.pdbrc') (glob)
   Symlink $TESTTMP/.bash_aliases exists.
   os.remove('$TESTTMP/.bash_aliases')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases', '$TESTTMP/.bash_aliases') (glob)
   Symlink $TESTTMP/.bashrc exists.
   os.remove('$TESTTMP/.bashrc')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
-  Symlink $TESTTMP/.mrconfig exists.
-  os.remove('$TESTTMP/.mrconfig')
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/mrconfig', '$TESTTMP/.mrconfig') (glob)
+  Symlink $TESTTMP/.hgignore exists.
+  os.remove('$TESTTMP/.hgignore')
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
   Symlink $TESTTMP/.hgrc exists.
   os.remove('$TESTTMP/.hgrc')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgrc', '$TESTTMP/.hgrc') (glob)
   Symlink $TESTTMP/.inputrc exists.
   os.remove('$TESTTMP/.inputrc')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/inputrc', '$TESTTMP/.inputrc') (glob)
-  Symlink $TESTTMP/.hgignore exists.
-  os.remove('$TESTTMP/.hgignore')
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
+  Symlink $TESTTMP/.local/bin/mr exists.
+  os.remove('$TESTTMP/.local/bin/mr')
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/mr', '$TESTTMP/.local/bin/mr') (glob)
+  Symlink $TESTTMP/.mrconfig exists.
+  os.remove('$TESTTMP/.mrconfig')
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/mrconfig', '$TESTTMP/.mrconfig') (glob)
+  Symlink $TESTTMP/.pdbrc exists.
+  os.remove('$TESTTMP/.pdbrc')
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/pdbrc', '$TESTTMP/.pdbrc') (glob)
   Configurations for your CoCalc project have been symlinked as described above.
   
   If you use version control, then to get the most of the configuration,
@@ -226,10 +219,11 @@ We filter the output with grep because the order of these installs is random.
   .bash_aliases@
   .bash_aliases.bak
   .bashrc@
+  .cache/ (?)
   .hgignore@
   .hgrc@
   .inputrc@
   .local/
   .mrconfig@
   .pdbrc@
-  * (glob)
+  Library/ (?)
