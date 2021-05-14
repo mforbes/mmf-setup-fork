@@ -53,12 +53,14 @@ update = if [ -e .hgrc ] && touch .hg/hgrc                                    \
              echo "Including this in .hg/hgrc is a potential security risk."; \
              echo "Only do this if you trust the repository.";                \
              echo;                                                            \
-             read -p "Include this .hgrc in .hg/hgrc? [yN]" -n 1 -r;          \
+             printf '%s' "Include this .hgrc in .hg/hgrc? [yN]";              \
+             read -r reply;                                                   \
              echo;                                                            \
-             if [[ $REPLY =~ ^[Yy]$ ]]; then                                  \
-                echo "Adding '%include ../.hgrc' to '.hg/hgrc'";              \
-                echo '%include ../.hgrc' >> .hg/hgrc;                         \
-             fi \
+             case $reply in                                                   \
+               [Yy])                                                          \
+                 echo "Adding '%include ../.hgrc' to '.hg/hgrc'";             \
+                 echo '%include ../.hgrc' >> .hg/hgrc;                        \
+             esac;                                                            \
          fi
 
 %include hgrc.lga

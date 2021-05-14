@@ -55,7 +55,7 @@ Now we do the full activation.
   Including this in .hg/hgrc is a potential security risk.
   Only do this if you trust the repository.
   
-  
+  Include this .hgrc in .hg/hgrc? [yN]
   Adding '%include ../.hgrc' to '.hg/hgrc'
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg lg
