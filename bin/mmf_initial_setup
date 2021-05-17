@@ -16,6 +16,7 @@ import re
 import sys
 from optparse import OptionParser, TitledHelpFormatter
 import subprocess
+import warnings
 
 # Parse arguments
 usage = "Usage: %prog [options] dir1 dir2 ..."
@@ -256,50 +257,61 @@ def main():
 
                 # Files are linked when the second line of the file
                 # looks like "# dest=~/.xsession" with optional whitespace
-                with open(src, "r") as fd:
-                    fd.readline()
-                    dest = re.match(r"\A\s*[#;\\]*\s*dest\s*=\s*(\S*)", fd.readline())
-
-                if dest is not None:
-                    dest = os.path.expanduser(dest.group(1))
-                    if dest.startswith(sys_home):
-                        # Replace with new home.
-
-                        dest = os.path.join(home_dir, dest[len(sys_home + os.sep) :])
-                if dest is not None:
-                    dest_dir = os.path.dirname(dest)
-                    if options.abspath:
-                        ln_src = os.path.abspath(src)
-                    else:
-                        ln_src = os.path.relpath(
-                            os.path.realpath(src), os.path.realpath(dest_dir)
+                try:
+                    with open(src, "r") as fd:
+                        fd.readline()
+                        dest = re.match(
+                            r"\A\s*[#;\\]*\s*dest\s*=\s*(\S*)", fd.readline()
                         )
+                except Exception:
+                    dest = None
 
-                    if not os.path.exists(dest_dir):
-                        mesg = "Directory %s does not exist." % (dest_dir,)
-                        query = "Create %s ?" % (dest_dir,)
-                        cmds = ["os.makedirs('%s')" % (dest_dir,)]
-                        do(cmds, mesg, query)
-                    if os.path.islink(dest):
-                        mesg = "Symlink %s exists." % (dest,)
-                        query = "Remove and replace with link to %s?" % (ln_src,)
-                        cmds = [
-                            "os.remove('%s')" % (dest,),
-                            "os.symlink('%s', '%s')" % (ln_src, dest),
-                        ]
-                        do(cmds, mesg, query)
-                    elif os.path.isfile(dest):
-                        mesg = "File %s exists." % (dest,)
-                        query = "Backup and symlink '%s' -> '%s'?" % (ln_src, dest)
-                        cmds = [
-                            "backup('%s')" % (dest,),
-                            "os.symlink('%s', '%s')" % (ln_src, dest),
-                        ]
-                        do(cmds, mesg, query)
-                    else:
-                        query = "Link %s to %s?" % (ln_src, dest)
-                        cmds = ["os.symlink('%s', '%s')" % (ln_src, dest)]
-                        do(cmds, query=query)
+                if dest is None:
+                    print(
+                        f"Warning: No dest = 2nd line in file '{src}'... ignoring",
+                        file=sys.stderr,
+                    )
+                    continue
+
+                dest = os.path.expanduser(dest.group(1))
+                if dest.startswith(sys_home):
+                    # Replace with new home.
+
+                    dest = os.path.join(home_dir, dest[len(sys_home + os.sep) :])
+
+                dest_dir = os.path.dirname(dest)
+                if options.abspath:
+                    ln_src = os.path.abspath(src)
+                else:
+                    ln_src = os.path.relpath(
+                        os.path.realpath(src), os.path.realpath(dest_dir)
+                    )
+
+                if not os.path.exists(dest_dir):
+                    mesg = "Directory %s does not exist." % (dest_dir,)
+                    query = "Create %s ?" % (dest_dir,)
+                    cmds = ["os.makedirs('%s')" % (dest_dir,)]
+                    do(cmds, mesg, query)
+                if os.path.islink(dest):
+                    mesg = "Symlink %s exists." % (dest,)
+                    query = "Remove and replace with link to %s?" % (ln_src,)
+                    cmds = [
+                        "os.remove('%s')" % (dest,),
+                        "os.symlink('%s', '%s')" % (ln_src, dest),
+                    ]
+                    do(cmds, mesg, query)
+                elif os.path.isfile(dest):
+                    mesg = "File %s exists." % (dest,)
+                    query = "Backup and symlink '%s' -> '%s'?" % (ln_src, dest)
+                    cmds = [
+                        "backup('%s')" % (dest,),
+                        "os.symlink('%s', '%s')" % (ln_src, dest),
+                    ]
+                    do(cmds, mesg, query)
+                else:
+                    query = "Link %s to %s?" % (ln_src, dest)
+                    cmds = ["os.symlink('%s', '%s')" % (ln_src, dest)]
+                    do(cmds, query=query)
 
 
 if __name__ == "__main__":

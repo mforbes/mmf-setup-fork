@@ -58,6 +58,9 @@ don't muck up the test-runner's ~/.local directory.
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
   python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
   # Setting up config files for CoCalc...
+  Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
+  Warning: No dest = 2nd line in file '*/cocalc/gitconfig'... ignoring (glob)
+  Warning: No dest = 2nd line in file '*/cocalc/message.txt'... ignoring (glob)
   Using <home> = $TESTTMP
   Using dir = */site-packages/mmf_setup/_data/config_files/cocalc (glob)
   File $TESTTMP/.bash_aliases exists.
@@ -99,6 +102,9 @@ don't muck up the test-runner's ~/.local directory.
 
 We filter the output with grep because the order of these installs is random.
   $ mmf_setup cocalc | grep -Ev "^(Requirement|Collecting|  Downloading)"
+  Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
+  Warning: No dest = 2nd line in file '*/cocalc/gitconfig'... ignoring (glob)
+  Warning: No dest = 2nd line in file '*/cocalc/message.txt'... ignoring (glob)
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
   python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
   Installing collected packages: * (glob)
@@ -163,6 +169,9 @@ We filter the output with grep because the order of these installs is random.
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
   python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
   # Setting up config files for CoCalc...
+  Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
+  Warning: No dest = 2nd line in file '*/cocalc/gitconfig'... ignoring (glob)
+  Warning: No dest = 2nd line in file '*/cocalc/message.txt'... ignoring (glob)
   Using <home> = $TESTTMP
   Using dir = */site-packages/mmf_setup/_data/config_files/cocalc (glob)
   Symlink $TESTTMP/.bash_aliases exists.
