@@ -62,6 +62,12 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
                     python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
                 fi
 
+                echo "# Installing poetry..."
+                echo "curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -"
+                if [[ $not_dry_run ]]; then
+                    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+                fi
+                
                 DATA_DIR="$(python -c 'import mmf_setup;print(mmf_setup.DATA)')"
                 echo "# Setting up config files for CoCalc..."
                 if [[ $not_dry_run ]]; then
