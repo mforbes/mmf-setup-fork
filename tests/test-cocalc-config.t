@@ -67,6 +67,7 @@ don't muck up the test-runner's ~/.local directory.
   backup('$TESTTMP/.bash_aliases')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases', '$TESTTMP/.bash_aliases') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/gitignore', '$TESTTMP/.gitignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgrc', '$TESTTMP/.hgrc') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/inputrc', '$TESTTMP/.inputrc') (glob)
@@ -118,6 +119,7 @@ We filter the output with grep because the order of these installs is random.
   os.rename('$TESTTMP/.bash_aliases', '$TESTTMP/.bash_aliases.bak')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases', '$TESTTMP/.bash_aliases') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/gitignore', '$TESTTMP/.gitignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgrc', '$TESTTMP/.hgrc') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/inputrc', '$TESTTMP/.inputrc') (glob)
@@ -156,6 +158,7 @@ We filter the output with grep because the order of these installs is random.
   .bash_aliases.bak
   .bashrc@
   .cache/ (?)
+  .gitignore@
   .hgignore@
   .hgrc@
   .inputrc@
@@ -180,6 +183,9 @@ We filter the output with grep because the order of these installs is random.
   Symlink $TESTTMP/.bashrc exists.
   os.remove('$TESTTMP/.bashrc')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
+  Symlink $TESTTMP/.gitignore exists.
+  os.remove('$TESTTMP/.gitignore')
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/gitignore', '$TESTTMP/.gitignore') (glob)
   Symlink $TESTTMP/.hgignore exists.
   os.remove('$TESTTMP/.hgignore')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
@@ -229,6 +235,7 @@ We filter the output with grep because the order of these installs is random.
   .bash_aliases.bak
   .bashrc@
   .cache/ (?)
+  .gitignore@
   .hgignore@
   .hgrc@
   .inputrc@
