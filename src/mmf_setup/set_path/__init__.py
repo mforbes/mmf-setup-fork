@@ -92,12 +92,16 @@ def get_root(cwd="."):
             if config_file.parts[-1] == "pyproject.toml":
                 root = get_toml_root(config_file)
                 if root:
-                    return root
+                    break
 
             if config_file.parts[-1] == "setup.cfg":
                 root = get_cfg_root(config_file)
                 if root:
-                    return root
+                    break
+    if root:
+        if not Path(root).is_absolute():
+            root = str(Path(config_file).parents[0] / root)
+        return root
 
     if root_dirs:
         root = root_dirs[0][0]
