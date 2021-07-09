@@ -49,3 +49,25 @@ _pip_completion()
 }
 complete -o default -F _pip_completion pip
 # pip bash completion end
+
+export PATH="$HOME/.poetry/bin:$PATH"
+
+# Finding stuff
+function finda {
+    find . \(                                                                    \
+	 -name ".hg" -o -name ".ipynb_checkpoints" -o -name "*.sage-*" \) -prune \
+	 -o -type f -print0 | xargs -0 grep -H "${*:1}"
+}
+
+function findf {
+    find . \(                                                                    \
+	 -name ".hg" -o -name ".ipynb_checkpoints" -o -name "*.sage-*" \) -prune \
+	 -o -type f -name "*.$1" -print0 | xargs -0 grep -H "${*:2}"
+}
+
+# I used to use aliases, but they cannot easily be overrriden by
+# personalzed customizations.
+function findpy { findf py "${*}"; }
+function findipy { findf ipynb "${*}"; }
+function findjs { findf js "${*}"; }
+function findcss { findf css "${*}"; }
