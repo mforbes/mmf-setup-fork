@@ -58,12 +58,16 @@ don't muck up the test-runner's ~/.local directory.
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
   python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
   # Setting up config files for CoCalc...
+  Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
+  Warning: No dest = 2nd line in file '*/cocalc/gitconfig'... ignoring (glob)
+  Warning: No dest = 2nd line in file '*/cocalc/message.txt'... ignoring (glob)
   Using <home> = $TESTTMP
   Using dir = */site-packages/mmf_setup/_data/config_files/cocalc (glob)
   File $TESTTMP/.bash_aliases exists.
   backup('$TESTTMP/.bash_aliases')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases', '$TESTTMP/.bash_aliases') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/gitignore', '$TESTTMP/.gitignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgrc', '$TESTTMP/.hgrc') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/inputrc', '$TESTTMP/.inputrc') (glob)
@@ -99,6 +103,9 @@ don't muck up the test-runner's ~/.local directory.
 
 We filter the output with grep because the order of these installs is random.
   $ mmf_setup cocalc | grep -Ev "^(Requirement|Collecting|  Downloading)"
+  Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
+  Warning: No dest = 2nd line in file '*/cocalc/gitconfig'... ignoring (glob)
+  Warning: No dest = 2nd line in file '*/cocalc/message.txt'... ignoring (glob)
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
   python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
   Installing collected packages: * (glob)
@@ -112,6 +119,7 @@ We filter the output with grep because the order of these installs is random.
   os.rename('$TESTTMP/.bash_aliases', '$TESTTMP/.bash_aliases.bak')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases', '$TESTTMP/.bash_aliases') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/gitignore', '$TESTTMP/.gitignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgrc', '$TESTTMP/.hgrc') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/inputrc', '$TESTTMP/.inputrc') (glob)
@@ -150,6 +158,7 @@ We filter the output with grep because the order of these installs is random.
   .bash_aliases.bak
   .bashrc@
   .cache/ (?)
+  .gitignore@
   .hgignore@
   .hgrc@
   .inputrc@
@@ -163,6 +172,9 @@ We filter the output with grep because the order of these installs is random.
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
   python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
   # Setting up config files for CoCalc...
+  Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
+  Warning: No dest = 2nd line in file '*/cocalc/gitconfig'... ignoring (glob)
+  Warning: No dest = 2nd line in file '*/cocalc/message.txt'... ignoring (glob)
   Using <home> = $TESTTMP
   Using dir = */site-packages/mmf_setup/_data/config_files/cocalc (glob)
   Symlink $TESTTMP/.bash_aliases exists.
@@ -171,6 +183,9 @@ We filter the output with grep because the order of these installs is random.
   Symlink $TESTTMP/.bashrc exists.
   os.remove('$TESTTMP/.bashrc')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
+  Symlink $TESTTMP/.gitignore exists.
+  os.remove('$TESTTMP/.gitignore')
+  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/gitignore', '$TESTTMP/.gitignore') (glob)
   Symlink $TESTTMP/.hgignore exists.
   os.remove('$TESTTMP/.hgignore')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
@@ -220,6 +235,7 @@ We filter the output with grep because the order of these installs is random.
   .bash_aliases.bak
   .bashrc@
   .cache/ (?)
+  .gitignore@
   .hgignore@
   .hgrc@
   .inputrc@

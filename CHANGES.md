@@ -1,6 +1,12 @@
 Changes
 =======
 
+## 0.4.3
+
+- Resolves issue #28: Failure of `mmf_initial_setup` on Mac OS X if .DS_Store files exist.
+- Resolves issue #29: Relative paths in config files resolve to absolute paths
+- Added aliases `findpy`, `findf`, `finda` etc. for CoCalc for running `find` + `grep`.
+
 ## 0.4.2
 
 - Resolves issue #26: Significant improvements for installation on CoCalc.
@@ -22,7 +28,6 @@ Changes
   `run-tests.py`.
 - Working GitHub workflows and cocalc tests.
 - Updated release process.
-
 
 ## 0.4.1
 
