@@ -121,6 +121,25 @@ def test_set_path_config(tmpdir, config_file_info, mmf_setup):
     assert Path(sys.path[0]).resolve() == root.resolve()
 
 
+def test_set_path_config_relative(tmpdir, config_file_info, mmf_setup):
+    """Regression test where config files pointing to a relative path fail."""
+    root = tmpdir / "A"
+    cwd = root / "B"
+    os.makedirs(cwd)
+
+    config_filename, config_template = config_file_info
+    config_file = tmpdir / config_filename
+    config_contents = config_template.format(root="A")
+
+    # Now do it for real.
+    with open(config_file, "w") as f:
+        f.write(config_contents)
+
+    mmf_setup.set_path(cwd=cwd)
+    assert Path(mmf_setup.ROOT).resolve() == root.resolve()
+    assert Path(sys.path[0]).resolve() == root.resolve()
+
+
 def test_set_path_toml_precedence(tmpdir, mmf_setup):
     """Check that pyproject.toml has precedence over setup.cfg"""
     root_toml = tmpdir / "A" / "R"
