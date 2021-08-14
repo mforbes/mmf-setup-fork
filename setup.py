@@ -83,7 +83,7 @@ setup(
     # Metadata
     author="Michael McNeil Forbes",
     author_email="michael.forbes+bitbucket@gmail.com",
-    url="https://bitbucket.org/mforbes/mmf_setup",
+    url="https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf-setup",
     description="Python Tools",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
