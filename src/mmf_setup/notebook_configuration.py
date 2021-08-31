@@ -140,6 +140,9 @@ def nbinit(
         handler.setLevel("DEBUG")
         logger.setLevel("DEBUG")
 
+        # Suppress messages from matplotlib though.
+        logging.getLogger("matplotlib").setLevel(logging.WARNING)
+
     ####################
     # Accumulate output for notebook to setup MathJaX etc.
     res = []
