@@ -1,6 +1,11 @@
 Changes
 =======
 
+## 0.4.4
+
+- Use python3 for CoCalc setup.  (Is a problem on Docker images).
+- Ignore matplotlib errors.
+
 ## 0.4.3
 
 - Resolves issue #28: Failure of `mmf_initial_setup` on Mac OS X if .DS_Store files exist.
