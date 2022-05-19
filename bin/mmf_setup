@@ -63,9 +63,9 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
                 fi
 
                 echo "# Installing poetry..."
-                echo "curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python -"
+                echo "curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python3 -"
                 if [[ $not_dry_run ]]; then
-                    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python -
+                    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python3 -
                 fi
                 
                 DATA_DIR="$(python3 -c 'import mmf_setup;print(mmf_setup.DATA)')"
