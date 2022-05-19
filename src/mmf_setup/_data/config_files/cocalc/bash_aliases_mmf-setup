@@ -1,5 +1,5 @@
 # Bash Aliases etc.; -*-Shell-script-*-
-# dest=~/.bash_aliases     # Keep this as the 2nd line for mmf_init_setup
+# dest=~/.bash_aliases_mmf-setup     # Keep this as the 2nd line for mmf_init_setup
 
 # If not running interactively, don't do anything
 case $- in
@@ -9,13 +9,17 @@ esac
 
 # This content inserted by mmf_setup
 # Add my mercurial configurations.
-eval "$(mmf_setup -v -H)"
+eval "$(mmf_setup -H)"
 
 # Git config
-export GIT_AUTHOR_NAME="${LC_GIT_USERNAME}"
-export GIT_AUTHOR_EMAIL="${LC_GIT_USEREMAIL}"
-export GIT_COMMITTER_NAME="${LC_GIT_USERNAME}"
-export GIT_COMMITTER_EMAIL="${LC_GIT_USEREMAIL}"
+if [ -z ${LC_GIT_USERNAME+x} ]; then
+  export GIT_AUTHOR_NAME="${LC_GIT_USERNAME}"
+  export GIT_COMMITTER_NAME="${LC_GIT_USERNAME}"
+fi
+if [ -z ${LC_GIT_USEREMAIL+x} ]; then
+  export GIT_AUTHOR_EMAIL="${LC_GIT_USEREMAIL}"
+  export GIT_COMMITTER_EMAIL="${LC_GIT_USEREMAIL}"
+fi
 
 git config --global alias.lg1 $'log --graph --abbrev-commit --decorate --date=relative --format=format:\'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)\' --all'
 git config --global alias.lg2 $'log --graph --abbrev-commit --decorate --format=format:\'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n\'\'          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)\' --all'
@@ -71,3 +75,6 @@ function findpy { findf py "${*}"; }
 function findipy { findf ipynb "${*}"; }
 function findjs { findf js "${*}"; }
 function findcss { findf css "${*}"; }
+
+function ap { anaconda-project "${*}"; }
+function apr { anaconda-project run "${*}"; }

@@ -1,4 +1,5 @@
 import os.path
+import warnings
 
 try:
     from importlib import metadata
@@ -7,6 +8,27 @@ except ImportError:
 
 from .notebook_configuration import nbinit
 from .set_path import set_path
+
+try:
+    ip = get_ipython()
+    from .ipython_setup import (
+        load_ipython_extension,
+        unload_ipython_extension,
+        register_magics,
+    )
+
+    register_magics(ip=ip)
+
+except NameError:
+    ip = None
+
+
+def nbinit():
+    warnings.warn(
+        "Calling mmf_setup.nbinit() is deprecated.  Use %nbinit instead.",
+        DeprecationWarning,
+    )
+
 
 __version__ = metadata.version(__name__)
 
@@ -19,6 +41,8 @@ __all__ = [
     "NBTHEMES",
     "HGRC_LGA",
     "HGRC_FULL",
+    "load_ipython_extension",
+    "unload_ipython_extension",
 ]
 
 MMF_SETUP = os.path.abspath(os.path.dirname(__file__))

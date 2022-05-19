@@ -41,7 +41,7 @@ In particular, I structure it for the following use-cases:
     [Miniconda](http://conda.pydata.org/miniconda.html)) and then updating the tools.
 3.  A place to document various aspects of installing and setting up python and related
     tools. Some of this is old, but kept here for reference.
-4.  A generic way of setting sys.path for development work using the following (in order
+4.  A generic way of setting `sys.path` for development work using the following (in order
     of decreasing precedence) by calling `mmf_setup.set_path()`.
     - An entry in a `pyproject.toml` file somewhere in a higher-level directory.
     - An entry in a `setup.cfg` file somewhere in a higher-level directory.
@@ -126,6 +126,25 @@ Quickstart (TL;DR)
     topics =
     hggit =
     ```
+
+Shortcuts
+=========
+
+As a convenience, we provide some shortcuts whereby importing a module will run code.
+These special modules have names that end in an underscore.  Thus, one can simply go:
+
+```python
+import mmf_setup.nbinit_
+```
+
+to get the default notebook initialization.  Note, however, that the output which sets
+various options like MathJaX macros will only be displayed when the module is first
+imported.  Thus, if you execute this cell again, the output will be lost.  For this
+reason, it is preferable to use the full form:
+
+```python
+import mmf_setup; mmf_setup.nbinit()
+```
 
 Setting `sys.path`
 ==================
