@@ -62,7 +62,13 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
                     python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
                 fi
 
-                DATA_DIR="$(python -c 'import mmf_setup;print(mmf_setup.DATA)')"
+                echo "# Installing poetry..."
+                echo "curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python3 -"
+                if [[ $not_dry_run ]]; then
+                    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python3 -
+                fi
+                
+                DATA_DIR="$(python3 -c 'import mmf_setup;print(mmf_setup.DATA)')"
                 echo "# Setting up config files for CoCalc..."
                 if [[ $not_dry_run ]]; then
                     if [[ ! -L ~/.bashrc && -f ~/.bashrc ]]; then
@@ -98,7 +104,7 @@ else
     else
         >&2 echo "Replace '. mmf_setup $*' with the following in your .bash_aliases file:"
         >&2 echo
-        >&2 echo "    eval \"\$(mmf_setup -v $*)\""
+        >&2 echo "    eval \"\$(mmf_setup $*)\""
         >&2 echo
         res="$(mmf_setup_bash.py $*)"
         errorCode=$?

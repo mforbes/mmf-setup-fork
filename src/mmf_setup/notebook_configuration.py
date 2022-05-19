@@ -2,24 +2,23 @@
 
 Usage:
 
-1) Add the following to the first code cell of your notebook:
+1. Add the following to the first code cell of your notebook:
 
-   import mmf_setup; mmf_setup.nbinit()
-
-2) Execute and save the results.
-
-3) Trust the notebook (File->Trust Notebook).
-
+       import mmf_setup; mmf_setup.nbinit()
+2. Execute and save the results.
+3. Trust the notebook (File->Trust Notebook).
 
 This module provides customization for Jupyter notebooks including
 styling and some pre-defined MathJaX macros.
 """
 import logging
 import os.path
+import warnings
 
 try:
     from IPython.display import HTML, Javascript, display, clear_output
 except (ImportError, KeyError):
+    IPython = None
     HTML = Javascript = display = clear_output = None
 
 __all__ = ["nbinit"]
@@ -114,8 +113,6 @@ def nbinit(
     quiet : bool
        If `True`, then do not display message about reloading and trusting notebook.
     """
-    clear_output()
-
     ####################
     # Logging to jupyter console.
     # Not exactly sure why this works, but here we add a handler
@@ -140,9 +137,22 @@ def nbinit(
         handler.setLevel("DEBUG")
         logger.setLevel("DEBUG")
 
+        # Suppress messages from matplotlib though.
+        logging.getLogger("matplotlib").setLevel(logging.WARNING)
+
     ####################
     # Accumulate output for notebook to setup MathJaX etc.
+    if not IPython:
+        warnings.warn("IPython could not be imported... no config will be displayed.")
+    else:
+        clear_output()
+
     res = []
+
+    def _display(val, wrapper=HTML):
+        res.append((val, wrapper))
+        if display:
+            display(wrapper(val))
 
     def _load(ext, theme=theme):
         """Try loading resource from theme, fallback to default"""
@@ -154,10 +164,6 @@ def nbinit(
                 with open(_file) as _f:
                     return _f.read()
         return ""
-
-    def _display(val, wrapper=HTML):
-        res.append((val, wrapper))
-        display(wrapper(val))
 
     # CSS
     _display(r"<style>{}</style>".format(_load(".css")))
