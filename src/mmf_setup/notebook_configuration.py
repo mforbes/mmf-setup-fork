@@ -16,6 +16,7 @@ import os.path
 import warnings
 
 try:
+    import IPython
     from IPython.display import HTML, Javascript, display, clear_output
 except (ImportError, KeyError):
     IPython = None
