@@ -56,16 +56,24 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
         fi
 
         hg="$(type -p hg)"
-        echo "# Installing mercurial, hg-evolve, hg-git, jupytext for python3..."
-        echo "python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext"
-        if [[ $not_dry_run ]]; then
-          python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
+        if type pipx 2> /dev/null && pipx list --short | grep "mmf-setup"; then
+          echo "# Injecting mmf-setup with mercurial, hg-evolve, hg-git, jupytext, and black"
+          echo "pipx inject mmf-setup mercurial hg-evolve hg-git jupytex black"
+          if [[ $not_dry_run ]]; then
+              pipx inject mmf-setup mercurial hg-evolve hg-git jupytex black
+          fi
+        else
+          echo "# Installing mercurial, hg-evolve, hg-git, jupytext for python3..."
+          echo "python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext"
+          if [[ $not_dry_run ]]; then
+            python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
+          fi
         fi
 
         echo "# Installing poetry..."
-        echo "curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python3 -"
+        echo "curl -sSL https://install.python-poetry.org | python3 -"
         if [[ $not_dry_run ]]; then
-          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python3 -
+          curl -sSL https://install.python-poetry.org | python3 -
         fi
 
         DATA_DIR="$(python3 -c 'import mmf_setup;print(mmf_setup.DATA)')"
