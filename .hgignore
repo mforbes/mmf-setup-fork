@@ -13,5 +13,6 @@ htmlcov
 */.\#*
 tests/.testtimes
 .nox
+_tmp/*
 
 commit_log.txt

@@ -66,5 +66,5 @@ Now try sourcing.  This should raise the deprecation warning
   WARNING: mmf_setup Deprecation - Please do not source mmf_setup in future.
   Replace '. mmf_setup ' with the following in your .bash_aliases file:
   
-      eval "$(mmf_setup -v )"
+      eval "$(mmf_setup )"
   
