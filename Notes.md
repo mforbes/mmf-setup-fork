@@ -57,7 +57,7 @@ Mercurial evolve and topics extensions enabled, and with [Black] and [Nox].
 
 ### Release Procedure
 
-*(Here is a sample release procedure going from `0.4.0` to `0.4.1`.  Modify the version
+*(Here is a sample release procedure going from `0.4.6` to `0.4.7`.  Modify the version
 numbers as appropriate)*
 
 1. **Preparation:** Make sure you do your work on the development branch with the name
@@ -69,8 +69,8 @@ numbers as appropriate)*
 
    ```bash
    hg up 0.4         # Run hg branch 0.4 if needed, but this should exist.
-   hg topic 0.4.1
-   # Check that setup.py has version='0.4.1.dev0'
+   hg topic 0.4.7
+   # Check that setup.py has version='0.4.7.dev0'
    ```
 
 2. **Development:** Complete your changes making sure code is well tested etc. While
@@ -99,7 +99,7 @@ numbers as appropriate)*
    Merge Requests as needed.  First merge all open topics to the development branch,
    then:
 
-   1. Change the revision in `setup.py` or `pyproject.toml` to `version='0.4.2'`,
+   1. Change the revision in `setup.py` or `pyproject.toml` to `version='0.4.7'`,
       dropping the `'.dev0'`.  Push this to Heptapod and create a merge request to
       merge this to the default branch.   Review the changes and fix as needed.
    2. Add notes about the changes in `CHANGES.md`.  *(These should be apparent from the review.)*
@@ -120,7 +120,7 @@ numbers as appropriate)*
 
       *(Eventually this will be done with [Poetry]).*
    5. If this works, then complete the Merge Request into the default branch with a commit
-      message starting: `"REL: 0.4.1"`.  *Unlike previously, do not close the
+      message starting: `"REL: 0.4.7"`.  *Unlike previously, do not close the
       branch. Just leave it open so it can be found.*
    6. Pull in these changes, update, and tag the commit.  Then return to the
       development branch for future work.
@@ -191,6 +191,15 @@ numbers as appropriate)*
    | |   Add comment to mmf_setup -v output so it can be evaled.
    ...
    ```
+
+CoCalc
+======
+Prior to 0.4.7, we used to install mercurial, etc. in the users `~/.local` folder.  This
+broke when the Ubuntu environment was upgraded (related to
+https://github.com/sympy/sympy/issues/23897).  CoCalc has fixed this, but it prompted us
+to use [pipx] instead.  This requires a little finesse while we use a bash entry-point
+`bin/mmf_setup`, but should work nicely once we switch to python entry-points in version
+0.5.
 
 Testing
 =======
@@ -391,3 +400,4 @@ The information about building the package for conda is specified in the
 [Poetry]: <https://python-poetry.org> "Poetry": Python packaging and dependency management made easy."
 [`run-tests.py`]: <https://www.mercurial-scm.org/wiki/WritingTests> "Mercurial test suite.
 [make]: <https://www.gnu.org/software/make/> "GNU Make"
+[pipx]: <https://pypa.github.io/pipx/>

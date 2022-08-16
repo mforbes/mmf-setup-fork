@@ -55,8 +55,11 @@ don't muck up the test-runner's ~/.local directory.
   $ mmf_setup cocalc -v
   DRY RUN: the following is what would happen with the -v option
   
+  pipx is */bin/pipx (glob) (?)
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
-  python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
+  python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
+  # Installing poetry...
+  curl -sSL https://install.python-poetry.org | python3 -
   # Setting up config files for CoCalc...
   Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
   Warning: No dest = 2nd line in file '*/cocalc/gitconfig'... ignoring (glob)
@@ -106,10 +109,44 @@ We filter the output with grep because the order of these installs is random.
   Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
   Warning: No dest = 2nd line in file '*/cocalc/gitconfig'... ignoring (glob)
   Warning: No dest = 2nd line in file '*/cocalc/message.txt'... ignoring (glob)
+  pipx is */bin/pipx (glob) (?)
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
-  python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
-  Installing collected packages: * (glob)
-  Successfully installed * (glob)
+  python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
+  # Installing poetry...
+  curl -sSL https://install.python-poetry.org | python3 -
+  Retrieving Poetry metadata
+  
+  # Welcome to Poetry!
+  
+  This will download and install the latest version of Poetry,
+  a dependency and package manager for Python.
+  
+  It will add the `poetry` command to Poetry's bin directory, located at:
+  
+  $TESTTMP/.local/bin
+  
+  You can uninstall at any time by executing this script with the --uninstall option,
+  and these changes will be reverted.
+  
+  Installing Poetry (*) (glob)
+  Installing Poetry (*): Creating environment (glob)
+  Installing Poetry (*): Installing Poetry (glob)
+  Installing Poetry (*): Creating script (glob)
+  Installing Poetry (*): Done (glob)
+  
+  Poetry (*) is installed now. Great! (glob)
+  
+  To get started you need Poetry's bin directory ($TESTTMP/.local/bin) in your `PATH`
+  environment variable.
+  
+  Add `export PATH="$TESTTMP/.local/bin:$PATH"` to your shell configuration file.
+  
+  Alternatively, you can call Poetry explicitly with `$TESTTMP/.local/bin/poetry`.
+  
+  You can test that everything is set up by executing:
+  
+  `poetry --version`
+  
   # Setting up config files for CoCalc...
   */mmf_initial_setup -v */site-packages/mmf_setup/_data/config_files/cocalc (glob)
   Using <home> = $TESTTMP
@@ -156,6 +193,7 @@ We filter the output with grep because the order of these installs is random.
   ../
   .bash_aliases@
   .bash_aliases.bak
+  .cache/ (?)
   .bashrc@
   .cache/ (?)
   .gitignore@
@@ -164,13 +202,17 @@ We filter the output with grep because the order of these installs is random.
   .inputrc@
   .local/
   .mrconfig@
+  Library/ (?)
   .pdbrc@
   Library/ (?)
   $ mmf_setup cocalc -v
   DRY RUN: the following is what would happen with the -v option
   
+  pipx is */bin/pipx (glob) (?)
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
-  python3 -m pip install --upgrade --user pip mercurial hg-evolve hg-git jupytext
+  python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
+  # Installing poetry...
+  curl -sSL https://install.python-poetry.org | python3 -
   # Setting up config files for CoCalc...
   Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
   Warning: No dest = 2nd line in file '*/cocalc/gitconfig'... ignoring (glob)
@@ -233,6 +275,7 @@ We filter the output with grep because the order of these installs is random.
   ../
   .bash_aliases@
   .bash_aliases.bak
+  .cache/ (?)
   .bashrc@
   .cache/ (?)
   .gitignore@
@@ -241,5 +284,6 @@ We filter the output with grep because the order of these installs is random.
   .inputrc@
   .local/
   .mrconfig@
+  Library/ (?)
   .pdbrc@
   Library/ (?)

@@ -19,16 +19,21 @@ In particular, I structure it for the following use-cases:
 
 1. Rapid installation and configuration of the tools I need. For example, I often use
    [CoCalc](cocalc.com). Whenever I create a new project, I need to perform some
-   initialization. With this project, it is simply a matter of using [`pip`] to install
+   initialization. With this project, it is simply a matter of using [`pipx`] to install
    this package, and then using some of the tools. Specifically:
 
     ```bash
-    python3 -m pip install --user mmf-setup
+    pipx install mmf-setup
     mmf_setup cocalc
-
-    # OR install from a particular version of the sources.
-    python3 -m pip install --user hg+https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf-setup@0.4.0
-    mmf_setup cocalc
+    ```
+    
+    This does the following, and then links various configuration files to the home
+    directory:
+    
+    ```bash
+    pipx install mmf-setup
+    pipx inject mmf-setup mercurial hg-evolve hg-git black
+    curl -sSL https://install.python-poetry.org | python3 -
     ```
 
 2.  Initial setup of a python distribution on a new computer. This is a little more

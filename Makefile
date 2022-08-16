@@ -21,7 +21,7 @@ test-cocalc:
 
 test-cocalc-debug:
 	rm -rf tests/_tmp
-	cd tests && $(PYTHON) run-tests.py -fd --tmpdir=_tmp --with-hg=$(HG) test-cocalc*.t $(TESTFLAGS)
+	cd tests && $(PYTHON) run-tests.py --with-hg=$(HG) -fd --tmpdir=_tmp test-cocalc*.t $(TESTFLAGS)
 
 test-py:
 	pytest
