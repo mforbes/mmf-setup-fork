@@ -10,9 +10,7 @@ Ensure that we are running without using any spurious packages in ~/.local.  I w
 having great diffiulty with random errors when a version of dulwich was installed there
 and thus randomly not getting installed by pip.
 
-  $ echo PYTHONNOUSERSITE="$PYTHONNOUSERSITE"
-  PYTHONNOUSERSITE=1
-
+  $ # echo PYTHONNOUSERSITE="$PYTHONNOUSERSITE"
   $ hg init
   $ touch .hgrc
   $ hg add .hgrc

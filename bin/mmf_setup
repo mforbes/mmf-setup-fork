@@ -27,6 +27,7 @@ function usage() {
 }
 
 BIN_DIR="$(dirname $BASH_SOURCE{0})"
+PYTHON3=python3
 
 if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]]; then
   if [[ -n $1 ]]; then
@@ -57,26 +58,30 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
 
         hg="$(type -p hg)"
         if type pipx 2> /dev/null && pipx list --short | grep "mmf-setup"; then
+          # Use pipx version of python from now on.
+          PYTHON3="$(pipx environment -v PIPX_LOCAL_VENVS)/mmf-setup/bin/python3"
+          echo "Found pipx mmf-setup venv... Switching to PYTHON3=$PYTHON3"
+
           echo "# Injecting mmf-setup with mercurial, hg-evolve, hg-git, jupytext, and black"
           echo "pipx inject mmf-setup mercurial hg-evolve hg-git jupytex black"
           if [[ $not_dry_run ]]; then
-              pipx inject mmf-setup mercurial hg-evolve hg-git jupytex black
+            pipx inject mmf-setup mercurial hg-evolve hg-git jupytex black
           fi
         else
           echo "# Installing mercurial, hg-evolve, hg-git, jupytext for python3..."
-          echo "python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext"
+          echo "$PYTHON3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext"
           if [[ $not_dry_run ]]; then
-            python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
+            $PYTHON3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
           fi
         fi
 
         echo "# Installing poetry..."
-        echo "curl -sSL https://install.python-poetry.org | python3 -"
+        echo "curl -sSL https://install.python-poetry.org | $PYTHON3 -"
         if [[ $not_dry_run ]]; then
-          curl -sSL https://install.python-poetry.org | python3 -
+          curl -sSL https://install.python-poetry.org | $PYTHON3 -
         fi
 
-        DATA_DIR="$(python3 -c 'import mmf_setup;print(mmf_setup.DATA)')"
+        DATA_DIR="$($PYTHON3 -c 'import mmf_setup;print(mmf_setup.DATA)')"
         echo "# Setting up config files for CoCalc..."
         if [[ $not_dry_run ]]; then
           if [[ ! -L ~/.bashrc && -f ~/.bashrc ]]; then
