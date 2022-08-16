@@ -54,6 +54,7 @@ don't muck up the test-runner's ~/.local directory.
   $ touch $HOME/.bash_aliases   # Touch this to see if mmf_setup backs it up.
   $ mmf_setup cocalc -v
   DRY RUN: the following is what would happen with the -v option
+  pipx is */bin/pipx (glob) (?)
   
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
   python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
@@ -68,7 +69,6 @@ don't muck up the test-runner's ~/.local directory.
   File $TESTTMP/.bash_aliases exists.
   backup('$TESTTMP/.bash_aliases')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases', '$TESTTMP/.bash_aliases') (glob)
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases_mmf-setup', '$TESTTMP/.bash_aliases_mmf-setup') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/gitignore', '$TESTTMP/.gitignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
@@ -104,11 +104,13 @@ don't muck up the test-runner's ~/.local directory.
         SendEnv LC_GIT_USEREMAIL
         SetEnv LC_EDITOR=vi
 
+
 We filter the output with grep because the order of these installs is random.
   $ mmf_setup cocalc | grep -Ev "^(Requirement|Collecting|  Downloading)"
   Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
   Warning: No dest = 2nd line in file '*/cocalc/gitconfig'... ignoring (glob)
   Warning: No dest = 2nd line in file '*/cocalc/message.txt'... ignoring (glob)
+  pipx is */bin/pipx (glob) (?)
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
   python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
   # Installing poetry...
@@ -154,7 +156,6 @@ We filter the output with grep because the order of these installs is random.
   backup('$TESTTMP/.bash_aliases')
   os.rename('$TESTTMP/.bash_aliases', '$TESTTMP/.bash_aliases.bak')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases', '$TESTTMP/.bash_aliases') (glob)
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases_mmf-setup', '$TESTTMP/.bash_aliases_mmf-setup') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/gitignore', '$TESTTMP/.gitignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
@@ -193,7 +194,6 @@ We filter the output with grep because the order of these installs is random.
   ../
   .bash_aliases@
   .bash_aliases.bak
-  .bash_aliases_mmf-setup@
   .cache/ (?)
   .bashrc@
   .cache/ (?)
@@ -222,9 +222,6 @@ We filter the output with grep because the order of these installs is random.
   Symlink $TESTTMP/.bash_aliases exists.
   os.remove('$TESTTMP/.bash_aliases')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases', '$TESTTMP/.bash_aliases') (glob)
-  Symlink $TESTTMP/.bash_aliases_mmf-setup exists.
-  os.remove('$TESTTMP/.bash_aliases_mmf-setup')
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases_mmf-setup', '$TESTTMP/.bash_aliases_mmf-setup') (glob)
   Symlink $TESTTMP/.bashrc exists.
   os.remove('$TESTTMP/.bashrc')
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
@@ -278,7 +275,6 @@ We filter the output with grep because the order of these installs is random.
   ../
   .bash_aliases@
   .bash_aliases.bak
-  .bash_aliases_mmf-setup@
   .cache/ (?)
   .bashrc@
   .cache/ (?)

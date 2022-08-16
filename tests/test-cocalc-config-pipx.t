@@ -3,9 +3,10 @@ don't muck up the test-runner's ~/.local directory.
 
   $ export PYTHONUSERBASE="$HOME/.local"
   $ export PATH="$HOME/.local/bin/:$PATH"
+  $ export PIPX_HOME="$HOME"
   $ python3 -m venv test_venv
   $ source test_venv/bin/activate
-  $ python3 -m pip install -q -U pipx
+  $ python3 -m pip install -q -U pip pipx
   $ pipx install "$RUNTESTDIR/.."
   creating virtual environment...
   creating shared libraries...
@@ -28,12 +29,13 @@ don't muck up the test-runner's ~/.local directory.
   $ mmf_setup cocalc -v
   DRY RUN: the following is what would happen with the -v option
   
-  pipx is $TESTTMP/.local/bin/pipx
+  pipx is $TESTTMP/test_venv/bin/pipx
   mmf-setup * (glob)
+  Found pipx mmf-setup venv... Switching to PYTHON3=$TESTTMP/venvs/mmf-setup/bin/python3
   # Injecting mmf-setup with mercurial, hg-evolve, hg-git, jupytext, and black
   pipx inject mmf-setup mercurial hg-evolve hg-git jupytex black
   # Installing poetry...
-  curl -sSL https://install.python-poetry.org | python3 -
+  curl -sSL https://install.python-poetry.org | $TESTTMP/venvs/mmf-setup/bin/python3 -
   # Setting up config files for CoCalc...
   Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
   Warning: No dest = 2nd line in file '*/cocalc/gitconfig'... ignoring (glob)
@@ -41,7 +43,6 @@ don't muck up the test-runner's ~/.local directory.
   Using <home> = $TESTTMP
   Using dir = */site-packages/mmf_setup/_data/config_files/cocalc (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases', '$TESTTMP/.bash_aliases') (glob)
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases_mmf-setup', '$TESTTMP/.bash_aliases_mmf-setup') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/gitignore', '$TESTTMP/.gitignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
@@ -90,8 +91,9 @@ We filter the output with grep because the order of these installs is random.
   Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
   Warning: No dest = 2nd line in file '*/cocalc/gitconfig'... ignoring (glob)
   Warning: No dest = 2nd line in file '*/cocalc/message.txt'... ignoring (glob)
-  pipx is $TESTTMP/.local/bin/pipx
+  pipx is $TESTTMP/test_venv/bin/pipx
   mmf-setup * (glob)
+  Found pipx mmf-setup venv... Switching to PYTHON3=$TESTTMP/venvs/mmf-setup/bin/python3
   # Injecting mmf-setup with mercurial, hg-evolve, hg-git, jupytext, and black
   pipx inject mmf-setup mercurial hg-evolve hg-git jupytex black
     injected package mercurial into venv mmf-setup
@@ -100,7 +102,7 @@ We filter the output with grep because the order of these installs is random.
     injected package jupytex into venv mmf-setup
     injected package black into venv mmf-setup
   # Installing poetry...
-  curl -sSL https://install.python-poetry.org | python3 -
+  curl -sSL https://install.python-poetry.org | $TESTTMP/venvs/mmf-setup/bin/python3 -
   Retrieving Poetry metadata
   
   # Welcome to Poetry!
@@ -139,7 +141,6 @@ We filter the output with grep because the order of these installs is random.
   Using <home> = $TESTTMP
   Using dir = */site-packages/mmf_setup/_data/config_files/cocalc (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases', '$TESTTMP/.bash_aliases') (glob)
-  os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bash_aliases_mmf-setup', '$TESTTMP/.bash_aliases_mmf-setup') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/bashrc', '$TESTTMP/.bashrc') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/gitignore', '$TESTTMP/.gitignore') (glob)
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/hgignore', '$TESTTMP/.hgignore') (glob)
