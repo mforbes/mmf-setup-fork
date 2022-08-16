@@ -54,8 +54,8 @@ don't muck up the test-runner's ~/.local directory.
   $ touch $HOME/.bash_aliases   # Touch this to see if mmf_setup backs it up.
   $ mmf_setup cocalc -v
   DRY RUN: the following is what would happen with the -v option
-  pipx is */bin/pipx (glob) (?)
   
+  pipx is */bin/pipx (glob) (?)
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
   python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
   # Installing poetry...
@@ -103,7 +103,6 @@ don't muck up the test-runner's ~/.local directory.
         SendEnv LC_GIT_USERNAME
         SendEnv LC_GIT_USEREMAIL
         SetEnv LC_EDITOR=vi
-
 
 We filter the output with grep because the order of these installs is random.
   $ mmf_setup cocalc | grep -Ev "^(Requirement|Collecting|  Downloading)"
@@ -209,6 +208,7 @@ We filter the output with grep because the order of these installs is random.
   $ mmf_setup cocalc -v
   DRY RUN: the following is what would happen with the -v option
   
+  pipx is */bin/pipx (glob) (?)
   # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
   python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
   # Installing poetry...
