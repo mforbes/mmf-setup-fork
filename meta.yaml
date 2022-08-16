@@ -1,5 +1,5 @@
 {% set name = "mmf_setup" %}
-{% set version = "0.4.1" %}
+{% set version = "0.4.7" %}
 
 package:
   name: "{{ name|lower }}"
@@ -17,10 +17,10 @@ build:
 
 requirements:
   host:
-    - python >=3
+    - python >=3.7
     - setuptools
   run:
-    - python >=3
+    - python >=3.7
 
 test:
   source_files:

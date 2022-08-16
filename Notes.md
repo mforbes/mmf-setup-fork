@@ -99,7 +99,7 @@ numbers as appropriate)*
    Merge Requests as needed.  First merge all open topics to the development branch,
    then:
 
-   1. Change the revision in `setup.py` or `pyproject.toml` to `version='0.4.2'`,
+   1. Change the revision in `setup.py` or `pyproject.toml` to `version='0.4.7'`,
       dropping the `'.dev0'`.  Push this to Heptapod and create a merge request to
       merge this to the default branch.   Review the changes and fix as needed.
    2. Add notes about the changes in `CHANGES.md`.  *(These should be apparent from the review.)*
@@ -120,7 +120,7 @@ numbers as appropriate)*
 
       *(Eventually this will be done with [Poetry]).*
    5. If this works, then complete the Merge Request into the default branch with a commit
-      message starting: `"REL: 0.4.1"`.  *Unlike previously, do not close the
+      message starting: `"REL: 0.4.7"`.  *Unlike previously, do not close the
       branch. Just leave it open so it can be found.*
    6. Pull in these changes, update, and tag the commit.  Then return to the
       development branch for future work.

@@ -1,6 +1,12 @@
 Changes
 =======
 
+## 0.4.7
+
+- Recommend and support installing mmf-setup with pipx on CoCalc.
+- Use new Poetry install.
+- Drop support for python3.6.
+
 ## 0.4.6
 
 - Use python3 for CoCalc setup.  (Is a problem on Docker images).
