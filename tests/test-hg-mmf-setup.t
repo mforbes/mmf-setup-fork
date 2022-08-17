@@ -5,7 +5,10 @@ The help message:
   
   The first invocation will setup cocalc.com projects:
   
-     mmf_setup cocalc [-v]
+     mmf_setup cocalc [-v] [packages]
+  
+  Additional packages such as black, jupytext, mercurial, hg-git, and hg-evolve can
+  be added if needed.  As of 16 Aug 2022, most of these are provided.
   
   The second invocation will show which environmental variables will be set,
   and can be evaluated to set these in your shell:
@@ -36,7 +39,10 @@ Try calling it without sourcing:
   
   The first invocation will setup cocalc.com projects:
   
-     mmf_setup cocalc [-v]
+     mmf_setup cocalc [-v] [packages]
+  
+  Additional packages such as black, jupytext, mercurial, hg-git, and hg-evolve can
+  be added if needed.  As of 16 Aug 2022, most of these are provided.
   
   The second invocation will show which environmental variables will be set,
   and can be evaluated to set these in your shell:
