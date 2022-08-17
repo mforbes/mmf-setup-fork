@@ -24,7 +24,7 @@ In particular, I structure it for the following use-cases:
 
     ```bash
     pipx install mmf-setup
-    mmf_setup cocalc
+    mmf_setup cocalc mercurial hg-evolve hg-git black
     ```
     
     This does the following, and then links various configuration files to the home

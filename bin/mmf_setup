@@ -11,7 +11,10 @@ function usage() {
   echo
   echo "The first invocation will setup cocalc.com projects:"
   echo
-  echo "   mmf_setup cocalc [-v]"
+  echo "   mmf_setup cocalc [-v] [packages]"
+  echo
+  echo "Additional packages such as black, jupytext, mercurial, hg-git, and hg-evolve can"
+  echo "be added if needed.  As of 16 Aug 2022, most of these are provided."
   echo
   echo "The second invocation will show which environmental variables will be set,"
   echo "and can be evaluated to set these in your shell:"
@@ -49,29 +52,22 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
           not_dry_run=true
         fi
 
-        if [[ "$*" ]]; then
-          echo "Unknown arguments 'mmf_setup cocalc $*':"
-          echo
-          usage
-          exit 1
-        fi
-
         hg="$(type -p hg)"
         if type pipx 2> /dev/null && pipx list --short | grep "mmf-setup"; then
           # Use pipx version of python from now on.
           PYTHON3="$(pipx environment -v PIPX_LOCAL_VENVS)/mmf-setup/bin/python3"
           echo "Found pipx mmf-setup venv... Switching to PYTHON3=$PYTHON3"
 
-          echo "# Injecting mmf-setup with mercurial, hg-evolve, hg-git, jupytext, and black"
-          echo "pipx inject mmf-setup mercurial hg-evolve hg-git jupytex black"
+          echo "# Injecting tools into mmf-setup:"
+          echo "pipx inject mmf-setup $*"
           if [[ $not_dry_run ]]; then
-            pipx inject mmf-setup mercurial hg-evolve hg-git jupytex black
+            pipx inject mmf-setup $*
           fi
         else
-          echo "# Installing mercurial, hg-evolve, hg-git, jupytext for python3..."
-          echo "$PYTHON3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext"
+          echo "# Installing tools for python3..."
+          echo "$PYTHON3 -m pip install -q --upgrade --user pip $*"
           if [[ $not_dry_run ]]; then
-            $PYTHON3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
+            $PYTHON3 -m pip install -q --upgrade --user pip $*
           fi
         fi
 
@@ -88,13 +84,13 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
              echo "mv ~/.bashrc ~/.bashrc_cocalc"
              mv ~/.bashrc ~/.bashrc_cocalc
           fi
-          echo "$BIN_DIR/mmf_initial_setup" -v "$DATA_DIR/config_files/cocalc" $*
-          "$BIN_DIR/mmf_initial_setup" -v "$DATA_DIR/config_files/cocalc" $*
+          echo "$BIN_DIR/mmf_initial_setup" -v "$DATA_DIR/config_files/cocalc"
+          "$BIN_DIR/mmf_initial_setup" -v "$DATA_DIR/config_files/cocalc"
         else
           if [[ ! -L ~/.bashrc && -f ~/.bashrc ]]; then
              echo "mv ~/.bashrc ~/.bashrc_cocalc"
           fi
-          "$BIN_DIR/mmf_initial_setup" --no-action -v "$DATA_DIR/config_files/cocalc" $*
+          "$BIN_DIR/mmf_initial_setup" --no-action -v "$DATA_DIR/config_files/cocalc"
         fi
         cat "$DATA_DIR/config_files/cocalc/message.txt"
 

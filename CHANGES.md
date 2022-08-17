@@ -1,6 +1,14 @@
 Changes
 =======
 
+## 0.4.8
+- Don't install mercurial etc. on CoCalc by default: these are now included in the
+  Default Ubuntu 20.04 image.  If you need these, then explicitly specify them:
+  
+  ```bash
+  mmf-setup cocalc mercurial hg-git hg-evolve jupytext black
+  ```
+  
 ## 0.4.7
 
 - Recommend and support installing mmf-setup with pipx on CoCalc.
