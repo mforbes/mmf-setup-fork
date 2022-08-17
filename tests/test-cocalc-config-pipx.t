@@ -26,14 +26,14 @@ don't muck up the test-runner's ~/.local directory.
       - mmf_initial_setup
       - mmf_setup
       - mmf_setup_bash.py
-  $ mmf_setup cocalc -v
+  $ mmf_setup cocalc -v black
   DRY RUN: the following is what would happen with the -v option
   
   pipx is $TESTTMP/test_venv/bin/pipx
   mmf-setup * (glob)
   Found pipx mmf-setup venv... Switching to PYTHON3=$TESTTMP/venvs/mmf-setup/bin/python3
-  # Injecting mmf-setup with mercurial, hg-evolve, hg-git, jupytext, and black
-  pipx inject mmf-setup mercurial hg-evolve hg-git jupytex black
+  # Injecting tools into mmf-setup:
+  pipx inject mmf-setup black
   # Installing poetry...
   curl -sSL https://install.python-poetry.org | $TESTTMP/venvs/mmf-setup/bin/python3 -
   # Setting up config files for CoCalc...
@@ -79,15 +79,7 @@ don't muck up the test-runner's ~/.local directory.
         SetEnv LC_EDITOR=vi
 
 We filter the output with grep because the order of these installs is random.
-  $ mmf_setup cocalc | grep -Ev "^(Requirement|Collecting|  Downloading)"
-  installing mercurial...
-  done! * (glob)
-  installing hg-evolve...
-  done! * (glob)
-  installing hg-git...
-  done! * (glob)
-  installing jupytex...
-  done! * (glob)
+  $ mmf_setup cocalc black | grep -Ev "^(Requirement|Collecting|  Downloading)"
   installing black...
   done! * (glob)
   Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
@@ -96,12 +88,8 @@ We filter the output with grep because the order of these installs is random.
   pipx is $TESTTMP/test_venv/bin/pipx
   mmf-setup * (glob)
   Found pipx mmf-setup venv... Switching to PYTHON3=$TESTTMP/venvs/mmf-setup/bin/python3
-  # Injecting mmf-setup with mercurial, hg-evolve, hg-git, jupytext, and black
-  pipx inject mmf-setup mercurial hg-evolve hg-git jupytex black
-    injected package mercurial into venv mmf-setup
-    injected package hg-evolve into venv mmf-setup
-    injected package hg-git into venv mmf-setup
-    injected package jupytex into venv mmf-setup
+  # Injecting tools into mmf-setup:
+  pipx inject mmf-setup black
     injected package black into venv mmf-setup
   # Installing poetry...
   curl -sSL https://install.python-poetry.org | $TESTTMP/venvs/mmf-setup/bin/python3 -

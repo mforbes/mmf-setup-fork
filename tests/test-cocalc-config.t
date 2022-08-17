@@ -27,7 +27,10 @@ don't muck up the test-runner's ~/.local directory.
   
   The first invocation will setup cocalc.com projects:
   
-     mmf_setup cocalc [-v]
+     mmf_setup cocalc [-v] [packages]
+  
+  Additional packages such as black, jupytext, mercurial, hg-git, and hg-evolve can
+  be added if needed.  As of 16 Aug 2022, most of these are provided.
   
   The second invocation will show which environmental variables will be set,
   and can be evaluated to set these in your shell:
@@ -52,12 +55,12 @@ don't muck up the test-runner's ~/.local directory.
      eval "$(mmf_setup -v [options])"
 
   $ touch $HOME/.bash_aliases   # Touch this to see if mmf_setup backs it up.
-  $ mmf_setup cocalc -v
+  $ mmf_setup cocalc -v black
   DRY RUN: the following is what would happen with the -v option
   
   pipx is */bin/pipx (glob) (?)
-  # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
-  python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
+  # Installing tools for python3...
+  python3 -m pip install -q --upgrade --user pip black
   # Installing poetry...
   curl -sSL https://install.python-poetry.org | python3 -
   # Setting up config files for CoCalc...
@@ -105,13 +108,13 @@ don't muck up the test-runner's ~/.local directory.
         SetEnv LC_EDITOR=vi
 
 We filter the output with grep because the order of these installs is random.
-  $ mmf_setup cocalc | grep -Ev "^(Requirement|Collecting|  Downloading)"
+  $ mmf_setup cocalc black | grep -Ev "^(Requirement|Collecting|  Downloading)"
   Warning: No dest = 2nd line in file '*/cocalc/README.md'... ignoring (glob)
   Warning: No dest = 2nd line in file '*/cocalc/gitconfig'... ignoring (glob)
   Warning: No dest = 2nd line in file '*/cocalc/message.txt'... ignoring (glob)
   pipx is */bin/pipx (glob) (?)
-  # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
-  python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
+  # Installing tools for python3...
+  python3 -m pip install -q --upgrade --user pip black
   # Installing poetry...
   curl -sSL https://install.python-poetry.org | python3 -
   Retrieving Poetry metadata
@@ -205,12 +208,12 @@ We filter the output with grep because the order of these installs is random.
   Library/ (?)
   .pdbrc@
   Library/ (?)
-  $ mmf_setup cocalc -v
+  $ mmf_setup cocalc -v black
   DRY RUN: the following is what would happen with the -v option
   
   pipx is */bin/pipx (glob) (?)
-  # Installing mercurial, hg-evolve, hg-git, jupytext for python3...
-  python3 -m pip install -q --upgrade --user pip mercurial hg-evolve hg-git jupytext
+  # Installing tools for python3...
+  python3 -m pip install -q --upgrade --user pip black
   # Installing poetry...
   curl -sSL https://install.python-poetry.org | python3 -
   # Setting up config files for CoCalc...
