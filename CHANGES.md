@@ -1,5 +1,10 @@
 Changes
 =======
+## 0.4.9
+- Remove blank lines from `default.tex` so that `mmf_setup.nbinit()` works on CoCalc
+  (workaround for [CoCalc issue #6210][]).
+  
+[CoCalc issue #6210]: <https://github.com/sagemathinc/cocalc/issues/6210>
 
 ## 0.4.8
 - Don't install mercurial etc. on CoCalc by default: these are now included in the
