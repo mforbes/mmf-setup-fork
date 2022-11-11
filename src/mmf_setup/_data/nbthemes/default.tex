@@ -16,6 +16,9 @@
 \newcommand{\ddiff}[3][]{\frac{\delta^{#1} #2}{\delta {#3}^{#1}}}
 \newcommand{\floor}[1]{\left\lfloor#1\right\rfloor}
 \newcommand{\ceil}[1]{\left\lceil#1\right\rceil}
+% The following allows KaTeX to render these for significantly improved
+% performance on CoCalc.
+\newcommand{\DeclareMathOperator}[2]{\newcommand{#1}{#2}}
 \DeclareMathOperator{\Tr}{Tr}
 \DeclareMathOperator{\erf}{erf}
 \DeclareMathOperator{\erfi}{erfi}
@@ -26,6 +29,6 @@
 \DeclareMathOperator{\sgn}{sgn}
 \DeclareMathOperator{\order}{O}
 \DeclareMathOperator{\diag}{diag}
-
+%
 \newcommand{\mylabel}[1]{\label{#1}\tag{#1}}
 \newcommand{\degree}{\circ}

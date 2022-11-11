@@ -5,6 +5,7 @@ mergemarkers = detailed
 
 [paths]
 default = ssh://git@hg.iscimath.org:11022/forbes-group/mmf-setup
+default = ssh://heptapod/forbes-group/mmf-setup
 
 # Default to the current revision (`.`) when pushing to `default`. 
 default:pushrev = .
