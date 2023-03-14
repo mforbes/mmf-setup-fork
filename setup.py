@@ -57,8 +57,9 @@ del mod
 
 
 def read(*names, **kwargs):
-    with io.open(join(dirname(__file__), *names),
-                 encoding=kwargs.get("encoding", "utf8")) as fh:
+    with io.open(
+        join(dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
+    ) as fh:
         return fh.read()
 
 
@@ -67,16 +68,14 @@ LONG_DESCRIPTION = "\n".join([read("README.md"), read("CHANGES.md")])
 
 setup(
     name=NAME,
-    version="0.4.10.dev0",
+    version="0.4.10",
     packages=find_packages("src"),
     package_dir={"": "src"},
     py_modules=[splitext(basename(_path))[0] for _path in glob("src/*.py")],
     install_requires=install_requires,
     tests_require=test_requires,
     extras_require=extras_require,
-    scripts=[
-        "bin/mmf_setup", "bin/mmf_initial_setup", "bin/mmf_setup_bash.py"
-    ],
+    scripts=["bin/mmf_setup", "bin/mmf_initial_setup", "bin/mmf_setup_bash.py"],
     # Include data from MANIFEST.in
     include_package_data=True,
     # Metadata
