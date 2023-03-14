@@ -25,12 +25,13 @@ don't muck up the test-runner's ~/.local directory.
   $ mmf_setup --help
   usage: mmf_setup cocalc [options] OR mmf_setup -v [options]
   
-  The first invocation will setup cocalc.com projects:
+  The first invocation will setup cocalc.com projects.  Use the -v option
+  to perform a dry run to see what would be done.
   
      mmf_setup cocalc [-v] [packages]
   
   Additional packages such as black, jupytext, mercurial, hg-git, and hg-evolve can
-  be added if needed.  As of 16 Aug 2022, most of these are provided.
+  be added if needed.  As of 16 Aug 2022, most of these are provided by CoCalc.
   
   The second invocation will show which environmental variables will be set,
   and can be evaluated to set these in your shell:
