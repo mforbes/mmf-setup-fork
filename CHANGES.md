@@ -1,5 +1,8 @@
 Changes
 =======
+## 0.4.10
+- Add warning on CoCalc if users have not set `LC_HG_USERNAME`, or `LC_GIT_USERNAME`.
+
 ## 0.4.9
 - Remove blank lines from `default.tex` so that `mmf_setup.nbinit()` works on CoCalc
   (workaround for [CoCalc issue #6210][]).

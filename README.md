@@ -18,7 +18,7 @@ install, and specifying dependencies.
 In particular, I structure it for the following use-cases:
 
 1. Rapid installation and configuration of the tools I need. For example, I often use
-   [CoCalc](cocalc.com). Whenever I create a new project, I need to perform some
+   [CoCalc][]. Whenever I create a new project, I need to perform some
    initialization. With this project, it is simply a matter of using [`pipx`] to install
    this package, and then using some of the tools. Specifically:
 
@@ -41,7 +41,7 @@ In particular, I structure it for the following use-cases:
     [Miniconda](http://conda.pydata.org/miniconda.html)) and then updating the tools.
 3.  A place to document various aspects of installing and setting up python and related
     tools. Some of this is old, but kept here for reference.
-4.  A generic way of setting sys.path for development work using the following (in order
+4.  A generic way of setting `sys.path` for development work using the following (in order
     of decreasing precedence) by calling `mmf_setup.set_path()`.
     - An entry in a `pyproject.toml` file somewhere in a higher-level directory.
     - An entry in a `setup.cfg` file somewhere in a higher-level directory.
@@ -221,8 +221,72 @@ $ tail .hg/hgrc
 %include ../.hgrc
 ```
 
+CoCalc
+======
 
-## Notes
+We provide some tools for working on [CoCalc][].  To get started, simply do to the
+following once you have enabled network access on your project by applying a license:
+
+```bash
+pipx install mmf-setup
+mmf_setup cocalc
+```
+
+To see exactly what this will do, run:
+
+```bash
+mmf_setup cocalc -v
+```
+
+Once this is done, you should ensure that, whenever you use a terminal on [CoCalc][],
+you appropriately set the following variables:
+
+* `LC_HG_USERNAME`: Used by [mercurial][].
+* `LC_GIT_USEREMAIL`, `LC_GIT_USERNAME`: Used by [git][].
+
+These will identify you as you when you commit your work.  (Needed, because all users
+share the same project.  See [cocalc#370][] for details.)
+
+[cocalc#370]: <https://github.com/sagemathinc/cocalc/issues/370>
+
+I recommend the following:
+
+1. Set the following variables on your personal computer:
+
+    ```bash
+    # ~/.bashrc or similar
+    LC_HG_USERNAME=Your Full Name <your.email.address+hg@gmail.com>
+    LC_GIT_USEREMAIL=your.email.address+git@gmail.com
+    LC_GIT_USERNAME=Your Full Name
+    ```
+    
+2. Forward these by adding the following to your SSH config file (`~/.ssh/config`):
+
+    ```
+    # ~/.ssh/config
+    Host cc-project1
+      User ff1cb986f...
+    
+    Host cc*
+      HostName ssh.cocalc.com
+      ForwardAgent yes
+      SendEnv LC_HG_USERNAME
+      SendEnv LC_GIT_USERNAME
+      SendEnv LC_GIT_USEREMAIL
+      SetEnv LC_EDITOR=vi
+    ```
+    
+    The appropriate value for `User` can be found in the project Settings on [CoCalc][]
+
+3. If you want to run [Git][] or [Mercurial][] from the [CoCalc][] web interface, then
+   create a named terminal -- i.e. `Michael.term` -- and then set these variables in the
+   terminal startup script.  (See https://doc.cocalc.com/terminal.html#startup-files for
+   details.)
+   
+[CoCalc]: <cocalc.com>
+
+
+# Notes
 
 See [Notes.md](Notes.md) for developer notes.  Other notes about python, IPython,
 etc. are stored in the [docs](docs) folder. 
@@ -273,3 +337,5 @@ etc. are stored in the [docs](docs) folder.
 [Evolve]: <https://www.mercurial-scm.org/doc/evolution/> "Mercurial Evolve extension"
 [Topics]: <https://www.mercurial-scm.org/doc/evolution/tutorials/topic-tutorial.html> "Mercurial Topics tutorial"
 [hg-git]: <https://hg-git.github.io>
+[mercurial]: https://www.mercurial-scm.org/
+[git]: https://git-scm.com/

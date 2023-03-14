@@ -47,10 +47,48 @@ alerts](https://img.shields.io/lgtm/alerts/g/mforbes/mmf-setup-fork.svg?logo=lgt
 
     [![Code style: black][black_img]][black]
 
+## Notebook Initialization
+
+Our standard approach for initializing Jupyter notebooks has been to include the
+following in the first cell of the notebook -- auto-executing if using the [`init_cell`]
+nbextension (currently no [jupyter-lab
+extension](https://github.com/jupyterlab/jupyterlab/issues/7620)):
+
+```ipython
+%pylab inline --no-import-all
+import mmf_setup; mmf_setup.nbinit()
+```
+
+This does a few things, including displaying HTML and javascript outputs with MathJaX
+configuration (new commands I often use like `\ket`) and adds the `mmf_setup.ROOT`
+directory to `sys.path`.  After version 0.5.0, we also look for a project `nbinit.py`
+file which we execute if it exists.
+
+For backwards compatibility, this should always work, but we would like to simplify this
+with the following:
+
+```ipython
+%matplotlib inline
+from nbinit import *
+```
+
+```ipython
+%load_ext mmf_setup    # Just do the MathJaX, set_path, etc.
+%nbinit                # Also import numpy as np, matplotlib.pyplot as plt etc.
+```
+
+```ipython
+%load_ext mmf_setup.nbinit  # Shortcut for both, but see caveat.
+```
+
+One caveat is that the display of MathJaX etc. will only work upon first import.  If
+this is an issue, then the old behavior should be used.
 
 
-Releases
---------
+
+
+
+## Releases
 
 To prepare for release, make sure you are running in a development environment with the
 Mercurial evolve and topics extensions enabled, and with [Black] and [Nox].
@@ -401,3 +439,4 @@ The information about building the package for conda is specified in the
 [`run-tests.py`]: <https://www.mercurial-scm.org/wiki/WritingTests> "Mercurial test suite.
 [make]: <https://www.gnu.org/software/make/> "GNU Make"
 [pipx]: <https://pypa.github.io/pipx/>
+[`init_cell`]: <https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/init_cell>

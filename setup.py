@@ -48,7 +48,6 @@ extras_require = {
     "mercurial": ["mercurial>=5.7.1", "hg-evolve>=10.3.0", "hg-git>=0.10.0"],
 }
 
-
 # Remove NAME from sys.modules so that it gets covered in tests. See
 # http://stackoverflow.com/questions/11279096
 for mod in sys.modules.keys():
@@ -67,10 +66,9 @@ def read(*names, **kwargs):
 # Get the long description from the README.md file
 LONG_DESCRIPTION = "\n".join([read("README.md"), read("CHANGES.md")])
 
-
 setup(
     name=NAME,
-    version="0.4.9",
+    version="0.4.10",
     packages=find_packages("src"),
     package_dir={"": "src"},
     py_modules=[splitext(basename(_path))[0] for _path in glob("src/*.py")],
@@ -82,8 +80,8 @@ setup(
     include_package_data=True,
     # Metadata
     author="Michael McNeil Forbes",
-    author_email="michael.forbes+bitbucket@gmail.com",
-    url="https://bitbucket.org/mforbes/mmf_setup",
+    author_email="michael.forbes+python@gmail.com",
+    url="https://github.com/forbes-group/mmf-setup",
     description="Python Tools",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",

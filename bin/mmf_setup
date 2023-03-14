@@ -9,12 +9,13 @@
 function usage() {
   echo "usage: mmf_setup cocalc [options] OR mmf_setup -v [options]"
   echo
-  echo "The first invocation will setup cocalc.com projects:"
+  echo "The first invocation will setup cocalc.com projects.  Use the -v option"
+  echo "to perform a dry run to see what would be done."
   echo
   echo "   mmf_setup cocalc [-v] [packages]"
   echo
   echo "Additional packages such as black, jupytext, mercurial, hg-git, and hg-evolve can"
-  echo "be added if needed.  As of 16 Aug 2022, most of these are provided."
+  echo "be added if needed.  As of 16 Aug 2022, most of these are provided by CoCalc."
   echo
   echo "The second invocation will show which environmental variables will be set,"
   echo "and can be evaluated to set these in your shell:"

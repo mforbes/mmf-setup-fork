@@ -1,6 +1,8 @@
 # Mercurial (hg) Init File; -*-Shell-script-*-
 # dest = ~/.hgignore     # Keep this as the 2nd line for mmf_init_setup
-
+#
+# This file contains many things that I commonly need to ignore.  For a more complete list, try
+# https://www.toptal.com/developers/gitignore/api/latex,python,c++
 syntax: glob
 
 # Personal stuff
@@ -10,24 +12,37 @@ syntax: glob
 .coverage                       # Code coverage reports
 .eggs                           # Python packages
 .tox                            # Testing files
+.nox
 
-
+### Python ###
+__pycache__/
 *.pyc                           # Compiled python files
 *.pyo                           # Optimized python files
+*.pyd                           # Compiled python files
 
 # Generic CoCalc Stuff - taken from ~/.gitignore
 # LaTeX stuff
 _build                          # I put LaTeX build products here.
+*-blx.aux
+*-blx.bib
 *.acn
-*.glo
-*.out
-*.upb
 *.aux
+*.bbl
+*.bcf
+*.blg
 *.dvi
 *.fdb_latexmk
 *.fls
+*.glo
 *.log
-*.synctex*
+*.out
+*.pdfsync
+*.run.xml
+*.synctex
+*.synctex(busy)
+*.synctex.gz
+*.synctex.gz(busy)
+*.upb
 
 # VIM
 *.swp
@@ -45,10 +60,6 @@ _build                          # I put LaTeX build products here.
 ### Linux hidden files ###
 /.*
 *~
-
-### Python ###
-__pycache__/
-*.py[cod]
 
 # SageMath parsed files
 *.sage.py

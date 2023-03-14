@@ -49,11 +49,16 @@ clean:
 	-rm -rf tests/.testtimes
 	-rm -rf .pytest_cache
 	-rm -rf mmf_setup.egg-info
-	-find . -name "*.pyc" -delete
-	-find . -name "*.pyo" -delete
-	-find . -name "__pycache__" -type d -delete
 	-rm README_CHANGES.*
 	-rm Notes.html
 	-rm -rf tests/_tmp
+	-rm -rf build
+	find . -type f -name "*.py[ocd]" -delete
+	find . -type f -name ".coverage" -delete
+	find . -type d -name "__pycache__" -exec rm -rf "{}" +
+	find . -type d -name "_build" -exec rm -rf "{}" +
+	find . -type d -name "htmlcov" -exec rm -rf "{}" +
+	find . -type d -name ".ipynb_checkpoints" -exec rm -rf "{}" +
+
 
 .PHONY: help test-cocalc test-cocalc-debug test-hg test-py test clean auto

@@ -55,16 +55,10 @@ don't muck up the test-runner's ~/.local directory.
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/pdbrc', '$TESTTMP/.pdbrc') (glob)
   Configurations for your CoCalc project have been symlinked as described above.
   
-  If you use version control, then to get the most of the configuration,
-  please make sure that you set the following variables on your personal
-  computer, and forward them when you ssh to the project:
-  
-      # ~/.bashrc or similar
-      LC_HG_USERNAME=Your Full Name <your.email.address+hg@gmail.com>
-      LC_GIT_USEREMAIL=your.email.address+git@gmail.com
-      LC_GIT_USERNAME=Your Full Name
-  
-  To forward these, your SSH config file (~/.ssh/config) might look like:
+  If you use version control, then to get the most of the configuration, please make sure
+  that you set the following variables on your personal computer, and forward them when
+  you ssh to the project.  This can be done with your SSH config file (~/.ssh/config)
+  which might look like (or use SendEnv if you define them in your environment):
   
       # ~/.ssh/config
       Host cc-project1
@@ -73,9 +67,9 @@ don't muck up the test-runner's ~/.local directory.
       Host cc*
         HostName ssh.cocalc.com
         ForwardAgent yes
-        SendEnv LC_HG_USERNAME
-        SendEnv LC_GIT_USERNAME
-        SendEnv LC_GIT_USEREMAIL
+        SetEnv LC_HG_USERNAME=Your Full Name <your.email.address+hg@gmail.com>
+        SetEnv LC_GIT_USEREMAIL=your.email.address+git@gmail.com
+        SetEnv LC_GIT_USERNAME=Your Full Name
         SetEnv LC_EDITOR=vi
 
 We filter the output with grep because the order of these installs is random.
@@ -141,16 +135,10 @@ We filter the output with grep because the order of these installs is random.
   os.symlink('*/site-packages/mmf_setup/_data/config_files/cocalc/pdbrc', '$TESTTMP/.pdbrc') (glob)
   Configurations for your CoCalc project have been symlinked as described above.
   
-  If you use version control, then to get the most of the configuration,
-  please make sure that you set the following variables on your personal
-  computer, and forward them when you ssh to the project:
-  
-      # ~/.bashrc or similar
-      LC_HG_USERNAME=Your Full Name <your.email.address+hg@gmail.com>
-      LC_GIT_USEREMAIL=your.email.address+git@gmail.com
-      LC_GIT_USERNAME=Your Full Name
-  
-  To forward these, your SSH config file (~/.ssh/config) might look like:
+  If you use version control, then to get the most of the configuration, please make sure
+  that you set the following variables on your personal computer, and forward them when
+  you ssh to the project.  This can be done with your SSH config file (~/.ssh/config)
+  which might look like (or use SendEnv if you define them in your environment):
   
       # ~/.ssh/config
       Host cc-project1
@@ -159,7 +147,7 @@ We filter the output with grep because the order of these installs is random.
       Host cc*
         HostName ssh.cocalc.com
         ForwardAgent yes
-        SendEnv LC_HG_USERNAME
-        SendEnv LC_GIT_USERNAME
-        SendEnv LC_GIT_USEREMAIL
+        SetEnv LC_HG_USERNAME=Your Full Name <your.email.address+hg@gmail.com>
+        SetEnv LC_GIT_USEREMAIL=your.email.address+git@gmail.com
+        SetEnv LC_GIT_USERNAME=Your Full Name
         SetEnv LC_EDITOR=vi

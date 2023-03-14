@@ -1,11 +1,17 @@
 # Configuration on CoCalc
 
 This directory contains files for setting up a project on CoCalc
-(cocalc.com).  They are based on the following assumptions:
+(cocalc.com).  We do this as follows:
 
-1. That the default `.bashrc` file sources `.bash_aliases`.  We put all of our
-   customizations in this latter file.  This is [the default on
-   CoCalc](https://doc.cocalc.com/howto/software-development.html?highlight=bash_aliases#is-bashrc-or-bash-profile-called-on-startup).
+1. We move the default `~/.bashrc` file to `~/.bashrc_cocalc`.
+2. We symlink the files in this directory.  This includes a replacement `~/.bashrc`
+   which first exports `PATH="~/.local/bin:$PATH` so that upgraded mercurial instances
+   can work over SSH, then sources the backup file.
+3. We source `~/.bash_aliases_mmf-setup` from `~/.bash_aliases`.
+
+This allows users to customize `~/.bash_aliases` if they need to which is [the default on
+   CoCalc](https://doc.cocalc.com/howto/software-development.html?highlight=bash_aliases#is-bashrc-or-bash-profile-called-on-startup)
+or customizing the shell.
    
 The following features are provided:
 
@@ -28,15 +34,18 @@ The following features are provided:
   
   ```
   # ~/.ssh/config
-  ...
-  Host cocalc*
-    HostName ssh.cocalc.com
-    ForwardAgent yes
-    SendEnv LC_HG_USERNAME
-    SendEnv LC_GIT_USERNAME
-    SendEnv LC_GIT_USEREMAIL
+    Host cc-project1
+      User ff1cb986f...
+    
+    Host cc*
+      HostName ssh.cocalc.com
+      ForwardAgent yes
+      SetEnv LC_HG_USERNAME=Your Full Name <your.email.address+hg@gmail.com>
+      SetEnv LC_GIT_USEREMAIL=your.email.address+git@gmail.com
+      SetEnv LC_GIT_USERNAME=Your Full Name
+      SetEnv LC_EDITOR=vi
   ```
 
-  The `LC_GIT_USER*` variables perform a similar function for `git`
-  but are set using git itself when `mmf_setup` is run.
+  The `LC_GIT_USER*` variables perform a similar function for `git` but are set using
+  git itself when `mmf_setup` is run.
 
