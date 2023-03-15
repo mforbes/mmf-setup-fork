@@ -1,5 +1,8 @@
 Changes
 =======
+## 0.4.11
+- Fix bug with warning on CoCalc.
+
 ## 0.4.10
 - Add warning on CoCalc if users have not set `LC_HG_USERNAME`, or `LC_GIT_USERNAME`.
 
