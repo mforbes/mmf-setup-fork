@@ -237,7 +237,13 @@ broke when the Ubuntu environment was upgraded (related to
 https://github.com/sympy/sympy/issues/23897).  CoCalc has fixed this, but it prompted us
 to use [pipx][] instead.  This requires a little finesse while we use a bash entry-point
 `bin/mmf_setup`, but should work nicely once we switch to python entry-points in version
-0.5.
+0.5.  *(Details: As far as I see it, before we provide python entry-points, we must
+[rely on setuptools][] to provision the scripts.  When we move to `pyproject.toml`, this
+will be done in the `[tools.setuptools]` section with `script-files`.)*
+
+[rely on setuptools]: 
+  <https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html#setuptools-specific-configuration>
+
 
 Testing
 =======
@@ -429,14 +435,18 @@ The information about building the package for conda is specified in the
 
 <!-- Links -->
 [Nox]: <https://nox.thea.codes> "Nox: Flexible test automation"
-[Hypermodern Python]: <https://cjolowicz.github.io/posts/hypermodern-python-01-setup/> "Hypermodern Python"
+[Hypermodern Python]: <https://cjolowicz.github.io/posts/hypermodern-python-01-setup/> 
+  "Hypermodern Python"
 [`pyenv`]: <https://github.com/pyenv/pyenv> "Simple Python Version Management: pyenv"
 [`minconda`]: <https://docs.conda.io/en/latest/miniconda.html> "Miniconda"
 [Conda]: <https://docs.conda.io> "Conda"
 [Heptapod]: <https://heptapod.net> "Heptapod website"
 [pytest]: <https://docs.pytest.org> "pytest"
-[Poetry]: <https://python-poetry.org> "Poetry": Python packaging and dependency management made easy."
-[`run-tests.py`]: <https://www.mercurial-scm.org/wiki/WritingTests> "Mercurial test suite.
+[Poetry]: <https://python-poetry.org> 
+  "Poetry: Python packaging and dependency management made easy."
+[`run-tests.py`]: <https://www.mercurial-scm.org/wiki/WritingTests> 
+  "Mercurial test suite."
 [make]: <https://www.gnu.org/software/make/> "GNU Make"
 [pipx]: <https://pypa.github.io/pipx/>
-[`init_cell`]: <https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/init_cell>
+[`init_cell`]: 
+  <https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/init_cell>
