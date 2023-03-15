@@ -11,7 +11,7 @@ Developer Notes
 Summary:
 
 * <https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf-setup>: Main development
-  repository (Mercurial) running on our hosted [Heptapod] server.  This is where
+  repository (Mercurial) running on our hosted [Heptapod][] server.  This is where
   [Issues](https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf-setup/issues), [Merge
   Requests](https://alum.mit.edu/www/mforbes/hg/forbes-group/mmf-setup/merge_requests)
   etc. should be reported.
@@ -91,7 +91,7 @@ this is an issue, then the old behavior should be used.
 ## Releases
 
 To prepare for release, make sure you are running in a development environment with the
-Mercurial evolve and topics extensions enabled, and with [Black] and [Nox].
+Mercurial evolve and topics extensions enabled, and with [Black][] and [Nox][].
 
 ### Release Procedure
 
@@ -235,18 +235,24 @@ CoCalc
 Prior to 0.4.7, we used to install mercurial, etc. in the users `~/.local` folder.  This
 broke when the Ubuntu environment was upgraded (related to
 https://github.com/sympy/sympy/issues/23897).  CoCalc has fixed this, but it prompted us
-to use [pipx] instead.  This requires a little finesse while we use a bash entry-point
+to use [pipx][] instead.  This requires a little finesse while we use a bash entry-point
 `bin/mmf_setup`, but should work nicely once we switch to python entry-points in version
-0.5.
+0.5.  *(Details: As far as I see it, before we provide python entry-points, we must
+[rely on setuptools][] to provision the scripts.  When we move to `pyproject.toml`, this
+will be done in the `[tools.setuptools]` section with `script-files`.)*
+
+[rely on setuptools]: 
+  <https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html#setuptools-specific-configuration>
+
 
 Testing
 =======
 
 We have two types of tests here:
 
-1. Standard python tests run with [pytest].  These are organized in the `tests/` folder
+1. Standard python tests run with [pytest][].  These are organized in the `tests/` folder
    and can simply be run with `pytest`.
-2. Tests of shell and mercurial functionality run with their [`run-tests.py`] script.
+2. Tests of shell and mercurial functionality run with their [`run-tests.py`][] script.
    These need a bit of care when being run because they execute commands.  They should
    be run using the `Makefile` which specifies some environmental flags.  Some things to
    be careful of when modifying these:
@@ -267,8 +273,8 @@ We have two types of tests here:
      We don't do this in the tests because this could be very confusing for a user, but
      occasionally check that this does not break the tests.
  
-The tests should be run with [Nox], which will test in an isolated environment against
-various versions of python.  Simply make sure that [Nox] is installed in your work
+The tests should be run with [Nox][], which will test in an isolated environment against
+various versions of python.  Simply make sure that [Nox][] is installed in your work
 environment, then simply run `nox`.  This does one of the following (see
 `nox.options.sessions` in [`noxfile.py`](noxfile.py)):
 
@@ -284,7 +290,7 @@ environment, then simply run `nox`.  This does one of the following (see
   that the cocalc script tries to install things with `--user` which is disallowed in
   virtualenvs.
   
-* If you don't, but have [Conda] installed, then you can have [Nox] install the required
+* If you don't, but have [Conda][] installed, then you can have [Nox][] install the required
 interpreters with conda by running:
 
   ```bash
@@ -306,8 +312,8 @@ revision numbers etc. for release 0.1.11.)
 1.  Make sure your code works and that the tests pass. Pull any open
     issues into the main release branch, closing those issue branches.
 
-    To run the tests, make sure you have [make], [Nox]
-    and [Conda] installed in some
+    To run the tests, make sure you have [make][], [Nox][]
+    and [Conda][] installed in some
     environment, then run:
 
         nox
@@ -429,14 +435,18 @@ The information about building the package for conda is specified in the
 
 <!-- Links -->
 [Nox]: <https://nox.thea.codes> "Nox: Flexible test automation"
-[Hypermodern Python]: <https://cjolowicz.github.io/posts/hypermodern-python-01-setup/> "Hypermodern Python"
+[Hypermodern Python]: <https://cjolowicz.github.io/posts/hypermodern-python-01-setup/> 
+  "Hypermodern Python"
 [`pyenv`]: <https://github.com/pyenv/pyenv> "Simple Python Version Management: pyenv"
 [`minconda`]: <https://docs.conda.io/en/latest/miniconda.html> "Miniconda"
 [Conda]: <https://docs.conda.io> "Conda"
 [Heptapod]: <https://heptapod.net> "Heptapod website"
 [pytest]: <https://docs.pytest.org> "pytest"
-[Poetry]: <https://python-poetry.org> "Poetry": Python packaging and dependency management made easy."
-[`run-tests.py`]: <https://www.mercurial-scm.org/wiki/WritingTests> "Mercurial test suite.
+[Poetry]: <https://python-poetry.org> 
+  "Poetry: Python packaging and dependency management made easy."
+[`run-tests.py`]: <https://www.mercurial-scm.org/wiki/WritingTests> 
+  "Mercurial test suite."
 [make]: <https://www.gnu.org/software/make/> "GNU Make"
 [pipx]: <https://pypa.github.io/pipx/>
-[`init_cell`]: <https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/init_cell>
+[`init_cell`]: 
+  <https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/init_cell>

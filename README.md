@@ -12,14 +12,14 @@ mmf-setup
 [![Binder:notebook](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/forbes-group/mmf-setup/branch/default)
 
 This meta-project provides an easy way to install all of the python tools I typically
-use. It also serves as a fairly minimal example of setting up a package tate [`pip`] can
+use. It also serves as a fairly minimal example of setting up a package that [pip][] can
 install, and specifying dependencies.
 
 In particular, I structure it for the following use-cases:
 
 1. Rapid installation and configuration of the tools I need. For example, I often use
    [CoCalc][]. Whenever I create a new project, I need to perform some
-   initialization. With this project, it is simply a matter of using [`pipx`] to install
+   initialization. With this project, it is simply a matter of using [pipx][] to install
    this package, and then using some of the tools. Specifically:
 
     ```bash
@@ -76,7 +76,7 @@ Quickstart (TL;DR)
         ```
 
     Note: these includes the `nbextensions` extra. You and run without the `--user` flag
-    if you want to install them system-wide rather than into [`site.USER_BASE`].
+    if you want to install them system-wide rather than into [`site.USER_BASE`][].
 
 3.  To get the notebook tools for Jupyter (IPython) notebooks, execute the following as
     a code cell in your notebook and then trust the notebook with `File/Trust Notebook`:
@@ -90,7 +90,7 @@ Quickstart (TL;DR)
     [NBViewer](http://nbviewer.ipython.org). One can specify different
     themes. (Presently only `theme='default'` and `theme='mmf'` are supported.)
 
-4.  **Mercurial:** If you want to install mercurial with the [hg-git] and [Evolve]
+4.  **Mercurial:** If you want to install mercurial with the [hg-git][] and [Evolve][]
     extensions, then you can do that with the `hg` extra:
 
     ```bash
@@ -192,8 +192,8 @@ o  198:d michael (20 hours ago) 0.4.0[0.4.0]
 ...
 ```
 
-The second version with `-H` adds some useful extensions: [hg-git], [Evolve], and
-enables [Topics].  The latter are required, for example, to interface with
+The second version with `-H` adds some useful extensions: [hg-git][], [Evolve][], and
+enables [Topics][].  The latter are required, for example, to interface with
 [Heptapod](https://octobus.net/blog/2019-09-04-heptapod-workflow.html).
 
 Finally, the `-H` option enables an `hg update` hook, which adds `%include ../.hgrc` to
@@ -251,16 +251,7 @@ share the same project.  See [cocalc#370][] for details.)
 
 I recommend the following:
 
-1. Set the following variables on your personal computer:
-
-    ```bash
-    # ~/.bashrc or similar
-    LC_HG_USERNAME=Your Full Name <your.email.address+hg@gmail.com>
-    LC_GIT_USEREMAIL=your.email.address+git@gmail.com
-    LC_GIT_USERNAME=Your Full Name
-    ```
-    
-2. Forward these by adding the following to your SSH config file (`~/.ssh/config`):
+1. Forward these variables in your SSH config file (`~/.ssh/config`):
 
     ```
     # ~/.ssh/config
@@ -270,21 +261,29 @@ I recommend the following:
     Host cc*
       HostName ssh.cocalc.com
       ForwardAgent yes
-      SendEnv LC_HG_USERNAME
-      SendEnv LC_GIT_USERNAME
-      SendEnv LC_GIT_USEREMAIL
+      SetEnv LC_HG_USERNAME=Your Full Name <your.email.address+hg@gmail.com>
+      SetEnv LC_GIT_USERNAME=Your Full Name
+      SetEnv LC_GIT_USEREMAIL=your.email.address+git@gmail.com
       SetEnv LC_EDITOR=vi
     ```
     
-    The appropriate value for `User` can be found in the project Settings on [CoCalc][]
+    The appropriate value for `User` can be found in the project Settings on [CoCalc][].
+    
+    Optionally, use `SendEnv ...` and set these on your personal computer:
 
-3. If you want to run [Git][] or [Mercurial][] from the [CoCalc][] web interface, then
+    ```bash
+    # ~/.bashrc or similar
+    LC_HG_USERNAME=Your Full Name <your.email.address+hg@gmail.com>
+    LC_GIT_USEREMAIL=your.email.address+git@gmail.com
+    LC_GIT_USERNAME=Your Full Name
+    ```
+
+2. If you want to run [Git][] or [Mercurial][] from the [CoCalc][] web interface, then
    create a named terminal -- i.e. `Michael.term` -- and then set these variables in the
    terminal startup script.  (See https://doc.cocalc.com/terminal.html#startup-files for
    details.)
    
 [CoCalc]: <cocalc.com>
-
 
 # Notes
 
@@ -326,16 +325,21 @@ etc. are stored in the [docs](docs) folder.
 
 <!-- Links -->
 [Nox]: <https://nox.thea.codes> "Nox: Flexible test automation"
-[Hypermodern Python]: <https://cjolowicz.github.io/posts/hypermodern-python-01-setup/> "Hypermodern Python"
+[Hypermodern Python]: <https://cjolowicz.github.io/posts/hypermodern-python-01-setup/> 
+  "Hypermodern Python"
 [`pyenv`]: <https://github.com/pyenv/pyenv> "Simple Python Version Management: pyenv"
 [`minconda`]: <https://docs.conda.io/en/latest/miniconda.html> "Miniconda"
 [Conda]: <https://docs.conda.io> "Conda"
 [Heptapod]: <https://heptapod.net> "Heptapod website"
 [pytest]: <https://docs.pytest.org> "pytest"
-[`pip`]: <https://pip.pypa.io> "pip: the package installer for Python"
+[pip]: <https://pip.pypa.io> "pip: the package installer for Python"
+[pipx]: <https://pypa.github.io/pipx/>
+  "pipx: Install and Run Python Applications in Isolated Environments"
 [`site.USER_BASE`]: <https://docs.python.org/3/library/site.html#site.USER_BASE>
-[Evolve]: <https://www.mercurial-scm.org/doc/evolution/> "Mercurial Evolve extension"
-[Topics]: <https://www.mercurial-scm.org/doc/evolution/tutorials/topic-tutorial.html> "Mercurial Topics tutorial"
+[Evolve]: <https://www.mercurial-scm.org/doc/evolution/> 
+  "Mercurial Evolve extension"
+[Topics]: <https://www.mercurial-scm.org/doc/evolution/tutorials/topic-tutorial.html> 
+  "Mercurial Topics tutorial"
 [hg-git]: <https://hg-git.github.io>
 [mercurial]: https://www.mercurial-scm.org/
 [git]: https://git-scm.com/

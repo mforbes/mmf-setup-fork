@@ -35,7 +35,7 @@ function _vcs_message {
 
 # Mercurial config
 if [ -z "${LC_HG_USERNAME}" ]; then
-    _hg = "$(type -p hg)"
+    _hg="${_hg:=$(type -p hg)}"
     echo "You have not set LC_HG_USERNAME!"
     echo "DO NOT USE HG to commit until you set LC_HG_USERNAME"
     echo
@@ -61,7 +61,7 @@ git config --global alias.lg2 $'log --graph --abbrev-commit --decorate --format=
 git config --global alias.lg $'!git lg1'
 
 if [ -z "${LC_GIT_USERNAME}" ]; then
-    _git = "$(type -p hg)"
+    _git="${_git:=$(type -p git)}"
     echo "You have not set LC_GIT_USERNAME!"
     echo "DO NOT USE GIT to commit until you set both LC_GIT_USERNAME and LC_GIT_USEREMAIL"
     echo
