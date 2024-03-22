@@ -15,7 +15,14 @@ function usage() {
   echo "   mmf_setup cocalc [-v] [packages]"
   echo
   echo "Additional packages such as black, jupytext, mercurial, hg-git, and hg-evolve can"
-  echo "be added if needed.  As of 16 Aug 2022, most of these are provided by CoCalc."
+  echo "be added if needed.  As of 16 Aug 2022, most of these are provided by CoCalc, but"
+  echo "might be needed on a Docker instance:"
+  echo
+  echo "    for app in mercurial black jupytext pdm poetry; do"
+  echo "        pipx install \$app"
+  echo "    done"
+  echo "    pipx inject mercurial hg-git hg-evolve"
+  echo "    curl micro.mamba.pm/install.sh | bash"
   echo
   echo "The second invocation will show which environmental variables will be set,"
   echo "and can be evaluated to set these in your shell:"
@@ -53,10 +60,31 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
           not_dry_run=true
         fi
 
+        if [[ ! -f ~/.local/bin/python3 ]]; then
+            echo "mkdir -p ~/.local/bin"
+            if [[ -f "${ANACONDA_CURRENT}/bin/python3" ]]; then
+                _python3="${ANACONDA_CURRENT}/bin/python3"
+            elif [[ -f "${ANACONDA2022}/bin/python3" ]]; then
+                _python3="${ANACONDA2022}/bin/python3"
+            elif [[ -f "${ANACONDA2021}/bin/python3" ]]; then
+                _python3="${ANACONDA2021}/bin/python3"
+            elif [[ -f "${ANACONDA2020}/bin/python3" ]]; then
+                _python3="${ANACONDA2020}/bin/python3"
+            fi
+            if [[ -f "${_python3}" ]]; then
+                echo "ln -sf ${_python3} ~/.local/bin/"
+                if [[ $not_dry_run ]]; then
+                    ln -sf ${_python3} ~/.local/bin/
+                fi
+            else
+                echo "ERROR: Could not find python3 to put in ~/.local/bin/"
+            fi
+        fi
+        
         hg="$(type -p hg)"
         if type pipx 2> /dev/null && pipx list --short | grep "mmf-setup"; then
           # Use pipx version of python from now on.
-          PYTHON3="$(pipx environment -v PIPX_LOCAL_VENVS)/mmf-setup/bin/python3"
+            PYTHON3="$(pipx environment --value PIPX_LOCAL_VENVS)/mmf-setup/bin/python3"
           echo "Found pipx mmf-setup venv... Switching to PYTHON3=$PYTHON3"
 
           echo "# Injecting tools into mmf-setup:"
