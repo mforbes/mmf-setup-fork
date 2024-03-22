@@ -4,8 +4,8 @@ mmf-setup
 [![Documentation Status][rtd_badge]][rtd]
 [![Tests][ci_badge]][ci]
 [![codecov.io][codecov_badge]][codecov]
-[![Language grade: Python][lgtm_mmf-setup_badge]][lgtm_mmf-setup]
-[![Language grade: Python][lgtm_mmf-setup-fork_badge]][lgtm_mmf-setup-fork]
+<!-- [![Language grade: Python][lgtm_mmf-setup_badge]][lgtm_mmf-setup] -->
+<!-- [![Language grade: Python][lgtm_mmf-setup-fork_badge]][lgtm_mmf-setup-fork] -->
 [![Pypi][PyPI_badge]][PyPI]
 [![Python versions][PyPI_versions]][PyPI]
 [![Code style: black][black_img]][black]

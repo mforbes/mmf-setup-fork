@@ -1,8 +1,8 @@
 Changes
 =======
 ## 0.4.12
-- Fix issue with `pipx` argument name changing (broken by 
-  [this commit](https://github.com/pypa/pipx/commit/7274ee47ba3ca0315e3ae92e5e1d26c66241a394)).
+- Fix issue with `pipx` argument name changing (broken by [pipx
+  #1159](https://github.com/pypa/pipx/pull/1159))
   
 ## 0.4.11
 - Fix bug with warning on CoCalc.
