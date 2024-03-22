@@ -137,10 +137,9 @@ numbers as appropriate)*
    Merge Requests as needed.  First merge all open topics to the development branch,
    then:
 
-   1. Change the revision in `setup.py`  to `version='0.4.12'`, dropping the `'.dev0'`.
+   1. Change the version in `pyproject.toml`  to `version='0.4.7'`, dropping the `'.dev0'`.
       Push this to Heptapod and create a merge request to merge this to the default
-      branch. Review the changes and fix as needed. 
-      *(Later this should be in `pyproject.toml`.)*
+      branch. Review the changes and fix as needed.
    2. Add notes about the changes in `CHANGES.md`.  *(These should be apparent from the review.)*
    3. Check that the documentation looks okay:
 

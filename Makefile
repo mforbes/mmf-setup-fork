@@ -29,7 +29,9 @@ test-py:
 test-hg:
 	cd tests && $(PYTHON) run-tests.py --with-hg=$(HG) test-hg*.t $(TESTFLAGS)
 
-test: test-cocalc test-hg test-py
+test: test-hg test-py
+
+test-all: test-cocalc test
 
 %.html: %.md
 	pandoc $< -o $@ --standalone
@@ -61,4 +63,4 @@ clean:
 	find . -type d -name ".ipynb_checkpoints" -exec rm -rf "{}" +
 
 
-.PHONY: help test-cocalc test-cocalc-debug test-hg test-py test clean auto
+.PHONY: help test-cocalc test-cocalc-debug test-hg test-py test test-all clean auto

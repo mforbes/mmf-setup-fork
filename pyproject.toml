@@ -1,0 +1,102 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mmf_setup"
+description = "Meta-package to quickly initialize my python environment."
+authors = [
+    {name = "Michael McNeil Forbes", email = "michael.forbes+python@gmail.com"},
+]
+license = {text = "BSD-3-Clause"}
+readme = "README.md"
+#repository = "https://github.com/mforbes/mmf-setup-fork/"
+requires-python = ">=3.8"
+#documentation = "https://mmf-setup.readthedocs.io/"
+keywords = ["ipython", "jupyter", "notebook", "setup", "mercurial"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+]
+
+dependencies = [
+    'tomlkit>=0.7.2',
+    'importlib-metadata; python_version<"3.10"',
+]
+#dynamic = ["version"]
+version = "0.4.12"
+
+[project.optional-dependencies]
+test = [
+    "notebook",
+    "pytest>=2.8.1",
+    "pytest-cov>=3.0.0",
+    "pytest-flake8>=1.0.7",
+    "pytest-xdist>=2.4.0",
+    "coverage",
+    "mercurial",
+    "hg-evolve",
+    "hg-git",
+    "twine",
+    "docutils",
+    "pipx",
+]
+nbextensions = ["jupyter_contrib_nbextensions"]
+hg = ["mercurial>=5.9.2", "hg-evolve>=10.4.0", "hg-git>=0.10.2"]
+mercurial = ["mercurial>=5.9.2", "hg-evolve>=10.4.0", "hg-git>=0.10.2"]
+
+[project.scripts]
+#mmf_setup = "mmf_setup.cli.mmf_setup:main"
+#mmf_initial_setup = "mmf_setup.cli.mmf_initial_setup:main"
+#mmf_setup_cocalc = "mmf_setup.cli.mmf_setup_cocalc:main"
+
+[tool.setuptools]
+script-files = ["bin/mmf_setup", "bin/mmf_initial_setup", "bin/mmf_setup_bash.py"]
+
+[tool.setuptools.dynamic]
+#version = {attr = "mmf_setup.__VERSION__"}
+readme = {file = ["README.md"]}
+
+######################################################################
+# PyTest
+[tool.pytest.ini_options]
+testpaths = [ "src/mmf_setup" ]
+markers = [
+    # mark test as a benchmark.  (Might be slow, or platform dependent)
+    "bench",
+    # mark test as slow.
+    "slow",
+]
+addopts = [
+    "-m not bench",
+    "--doctest-modules",
+    "--cov=src/mmf_setup",
+    "--cov-report=html",
+    #"--cov-fail-under=80",
+    "--no-cov-on-fail",
+    #"-x",
+    #"--pdb",
+    #"--flake8",  # Disable until https://github.com/tholo/pytest-flake8/issues/8
+]
+
+doctest_optionflags = [
+    "ELLIPSIS",
+    "NORMALIZE_WHITESPACE"
+    ]
+
+######################################################################
+# Black
+[tool.black]
+exclude = '''
+    /(
+        \.git
+      | \.hg
+      | \.nox
+      | \.venv
+      | _build
+      | build
+      | dist
+    )/
+'''
