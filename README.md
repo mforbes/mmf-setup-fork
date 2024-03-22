@@ -320,9 +320,6 @@ etc. are stored in the [docs](docs) folder.
 
 <!-- [![Conda -->
 <!-- Version](https://img.shields.io/conda/vn/conda-forge/jupytext.svg)](https://anaconda.org/conda-forge/jupytext) -->
-
-
-
 <!-- Links -->
 [Nox]: <https://nox.thea.codes> "Nox: Flexible test automation"
 [Hypermodern Python]: <https://cjolowicz.github.io/posts/hypermodern-python-01-setup/> 
