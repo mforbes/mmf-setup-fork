@@ -3,6 +3,7 @@ Changes
 ## 0.4.12
 - Fix issue with `pipx` argument name changing (broken by [pipx
   #1159](https://github.com/pypa/pipx/pull/1159))
+- Drop support for python 3.7 (EoL).
   
 ## 0.4.11
 - Fix bug with warning on CoCalc.

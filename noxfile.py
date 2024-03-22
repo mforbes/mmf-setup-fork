@@ -13,7 +13,7 @@ os.environ["PYTHONNOUSERSITE"] = "1"
 # desired.
 nox.options.sessions = ["test_conda"]
 
-args = dict(python=["3.7", "3.8", "3.9"], reuse_venv=False)
+args = dict(python=["3.8", "3.9", "3.10", "3.11"], reuse_venv=False)
 
 
 @nox.session(**args)

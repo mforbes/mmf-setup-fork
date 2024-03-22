@@ -22,6 +22,7 @@ print(setuptools.__version__)
 NAME = "mmf_setup"
 
 install_requires = [
+    "python>=3.9,<4",
     "tomlkit",
     "importlib-metadata",
 ]
