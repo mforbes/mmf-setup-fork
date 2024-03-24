@@ -55,6 +55,7 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
           shift # move to the next argument
           echo "DRY RUN: the following is what would happen with the -v option"
           echo
+          # Default is empty so when debugging, the default is dry run.
           not_dry_run=
         else
           not_dry_run=true
@@ -72,19 +73,19 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
                 _python3="${ANACONDA2020}/bin/python3"
             fi
             if [[ -f "${_python3}" ]]; then
-                echo "ln -sf ${_python3} ~/.local/bin/"
-                if [[ $not_dry_run ]]; then
-                    ln -sf ${_python3} ~/.local/bin/
-                fi
+              echo "ln -sf ${_python3} ~/.local/bin/"
+              if [[ $not_dry_run ]]; then
+                ln -sf ${_python3} ~/.local/bin/
+              fi
             else
-                echo "ERROR: Could not find python3 to put in ~/.local/bin/"
+              echo "ERROR: Could not find python3 to put in ~/.local/bin/"
             fi
         fi
         
         hg="$(type -p hg)"
         if type pipx 2> /dev/null && pipx list --short | grep "mmf-setup"; then
           # Use pipx version of python from now on.
-            PYTHON3="$(pipx environment --value PIPX_LOCAL_VENVS)/mmf-setup/bin/python3"
+          PYTHON3="$(pipx environment --value PIPX_LOCAL_VENVS)/mmf-setup/bin/python3"
           echo "Found pipx mmf-setup venv... Switching to PYTHON3=$PYTHON3"
 
           echo "# Injecting tools into mmf-setup:"
@@ -98,6 +99,25 @@ if [[ -n $BASH_VERSION ]] && [[ "$(basename "$0" 2> /dev/null)" == "mmf_setup" ]
           if [[ $not_dry_run ]]; then
             $PYTHON3 -m pip install -q --upgrade --user pip $*
           fi
+        fi
+
+        echo "# Checking for mercurial extensions..."
+        if type hg; then
+          HG_PYTHON="$(hg debuginstall 2> /dev/null | grep 'Python executable' \
+                                                    | sed 's/.*(\(.*\))/\1/g')"
+          for ext_pkg in "evolve hg-evolve" "hggit hg-git"; do
+            # See https://stackoverflow.com/a/52228219
+            set -- ${ext_pkg}  # Set the two arguments to $1 and $2.
+            ext=$1
+            pkg=$2
+            if [[ ! "$(hg debugextensions 2> /dev/null | grep ${ext})" ]]; then
+              echo "# Installing ${ext} extension..."
+              echo "${HG_PYTHON} -m pip install -q --upgrade --user ${pkg}"  
+              if [[ $not_dry_run ]]; then
+                "${HG_PYTHON}" -m pip install -q --upgrade --user ${pkg}
+              fi
+            fi
+          done
         fi
 
         echo "# Installing poetry..."
